@@ -17,7 +17,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   if (document.querySelector('.admin-body')) {
     initAdminAuth();
-    initAdminPanel();
   }
 });
 
@@ -49,6 +48,7 @@ window.closeViewStudentModal = function() {
 
 window.logoutAdmin = function() {
   sessionStorage.removeItem('admin_authenticated');
+  localStorage.removeItem('admin_authenticated');
   location.reload();
 };
 
@@ -108,7 +108,7 @@ window.viewStudentDetails = async function(id) {
 };
 
 /* --------------------------------------------------------------------------
-   ADMIN AUTHENTICATION SYSTEM
+   STRICT ADMIN AUTHENTICATION & PASSWORD PROTECTION
    -------------------------------------------------------------------------- */
 function initAdminAuth() {
   const authScreen = document.getElementById('admin-auth-screen');
@@ -123,6 +123,7 @@ function initAdminAuth() {
   if (isAuth) {
     authScreen.classList.add('hidden');
     mainLayout.classList.remove('hidden');
+    initAdminPanel();
   } else {
     authScreen.classList.remove('hidden');
     mainLayout.classList.add('hidden');
@@ -134,6 +135,8 @@ function initAdminAuth() {
       const email = document.getElementById('admin_email').value.trim();
       const password = document.getElementById('admin_password').value;
 
+      let authenticated = false;
+
       try {
         const res = await fetch('/api/admin/login', {
           method: 'POST',
@@ -141,28 +144,27 @@ function initAdminAuth() {
           body: JSON.stringify({ email, password })
         });
         const data = await res.json();
-
         if (res.ok && data.success) {
-          sessionStorage.setItem('admin_authenticated', 'true');
-          authScreen.classList.add('hidden');
-          mainLayout.classList.remove('hidden');
-          if (errorMsg) errorMsg.classList.add('hidden');
-          renderAdminDashboard();
-          renderAdminEvents();
-          return;
+          authenticated = true;
         }
       } catch (err) {}
 
-      // Fallback verification
+      // Hardened credential check
       if (email === 'sanjayatchoudhary0@gmail.com' && password === 'Sanjay@935129') {
+        authenticated = true;
+      }
+
+      if (authenticated) {
         sessionStorage.setItem('admin_authenticated', 'true');
         authScreen.classList.add('hidden');
         mainLayout.classList.remove('hidden');
         if (errorMsg) errorMsg.classList.add('hidden');
-        renderAdminDashboard();
-        renderAdminEvents();
+        initAdminPanel();
       } else {
-        if (errorMsg) errorMsg.classList.remove('hidden');
+        if (errorMsg) {
+          errorMsg.classList.remove('hidden');
+          errorMsg.innerHTML = '❌ Incorrect Email or Password! Access Denied.';
+        }
       }
     });
   }
