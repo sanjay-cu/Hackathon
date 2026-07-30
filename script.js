@@ -1,9 +1,9 @@
 /* ==========================================================================
-   PAN-INDIA CAMPUS OPPORTUNITY HUB SCRIPT WITH FULL ENTERPRISE ADMIN PANEL
+   PAN-INDIA CAMPUS OPPORTUNITY HUB SCRIPT WITH MONGODB ATLAS & ADMIN PANEL
    ========================================================================== */
 
-document.addEventListener('DOMContentLoaded', () => {
-  initStorage();
+document.addEventListener('DOMContentLoaded', async () => {
+  await initStorage();
   initMobileDrawer();
   initFormValidation();
   initMultiFilters();
@@ -46,8 +46,8 @@ window.closeViewStudentModal = function() {
   if (modal) modal.classList.add('hidden');
 };
 
-window.viewStudentDetails = function(id) {
-  const enquiries = getEnquiries();
+window.viewStudentDetails = async function(id) {
+  const enquiries = await getEnquiries();
   const student = enquiries.find(e => e.id === id);
   if (!student) return;
 
@@ -91,8 +91,8 @@ window.viewStudentDetails = function(id) {
   }
 
   if (vAcceptBtn) {
-    vAcceptBtn.onclick = function() {
-      updateLeadStatus(student.id, 'Confirmed');
+    vAcceptBtn.onclick = async function() {
+      await updateLeadStatus(student.id, 'Confirmed');
       window.closeViewStudentModal();
       alert(`🎉 Application for ${student.name} confirmed! Acceptance push notification dispatched.`);
     };
@@ -102,9 +102,19 @@ window.viewStudentDetails = function(id) {
 };
 
 /* --------------------------------------------------------------------------
-   0. LocalStorage Database Engine
+   0. Database Sync Engine (MongoDB Atlas API + LocalStorage Fallback)
    -------------------------------------------------------------------------- */
-function initStorage() {
+async function initStorage() {
+  try {
+    const res = await fetch('/api/enquiries');
+    if (res.ok) {
+      console.log('⚡ MongoDB Atlas API Live Sync Active!');
+      return;
+    }
+  } catch (e) {
+    console.log('ℹ️ Running in LocalStorage fallback mode.');
+  }
+
   if (!localStorage.getItem('cu_enquiries')) {
     const initialEnquiries = [
       {
@@ -128,17 +138,6 @@ function initStorage() {
         college: 'Chandigarh University',
         message: 'Applying for AI Drone robotics competition. Github: https://github.com/rohan/ai-drone',
         status: 'Pending'
-      },
-      {
-        id: 'CU-LEAD-9014',
-        date: '2026-07-29 04:30 PM',
-        name: 'Manish Singh',
-        email: 'manish.mech@cuchd.in',
-        phone: '9765432109',
-        course: 'Agentic & Generative AI Workshop [PAID]',
-        college: 'Chandigarh University',
-        message: 'Interested in LangChain hands-on bootcamp.',
-        status: 'Contacted'
       }
     ];
     localStorage.setItem('cu_enquiries', JSON.stringify(initialEnquiries));
@@ -151,13 +150,6 @@ function initStorage() {
         title: '🎉 Application Approved!',
         body: 'Your registration for CU HackNation 2026 has been accepted by the Coordinator.',
         time: 'Just now',
-        read: false
-      },
-      {
-        id: 'NOTIF-102',
-        title: '📜 Workshop Seat Confirmed',
-        body: 'Your slot for Agentic & Generative AI Masterclass at CU Mohali is confirmed.',
-        time: '2 hours ago',
         read: false
       }
     ];
@@ -176,70 +168,93 @@ function initStorage() {
         desc: 'National robotics & AI innovation battle in autonomous drones.',
         location: 'Mumbai, Maharashtra',
         inst: 'iit'
-      },
-      {
-        id: 'EV-102',
-        title: 'CU HackNation 2026 (24-Hr Hackathon)',
-        category: 'hackathon',
-        fee: 'free',
-        organizer: 'Chandigarh University',
-        prize: '₹2,50,000 Cash',
-        desc: 'Build real-world solutions in AI, Web3, FinTech & Healthcare.',
-        location: 'Mohali, Punjab',
-        inst: 'cu'
-      },
-      {
-        id: 'EV-103',
-        title: 'Agentic & Generative AI Masterclass',
-        category: 'workshop',
-        fee: 'paid',
-        organizer: 'Ethical Edufabrica & CU',
-        prize: 'MSME & ISO Cert',
-        desc: 'Build Autonomous AI Agents, RAG pipelines & LangChain.',
-        location: 'Mohali, Punjab',
-        inst: 'cu'
       }
     ];
     localStorage.setItem('cu_events', JSON.stringify(initialEvents));
   }
 }
 
-function getEnquiries() {
+async function getEnquiries() {
+  try {
+    const res = await fetch('/api/enquiries');
+    if (res.ok) return await res.json();
+  } catch (e) {}
   return JSON.parse(localStorage.getItem('cu_enquiries') || '[]');
 }
 
-function saveEnquiries(data) {
-  localStorage.setItem('cu_enquiries', JSON.stringify(data));
+async function saveEnquiryItem(item) {
+  try {
+    const res = await fetch('/api/enquiries', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(item)
+    });
+    if (res.ok) return await res.json();
+  } catch (e) {}
+
+  const enquiries = JSON.parse(localStorage.getItem('cu_enquiries') || '[]');
+  enquiries.unshift(item);
+  localStorage.setItem('cu_enquiries', JSON.stringify(enquiries));
+  return item;
 }
 
-function getNotifications() {
+async function getNotifications() {
+  try {
+    const res = await fetch('/api/notifications');
+    if (res.ok) return await res.json();
+  } catch (e) {}
   return JSON.parse(localStorage.getItem('cu_notifications') || '[]');
 }
 
-function saveNotifications(data) {
-  localStorage.setItem('cu_notifications', JSON.stringify(data));
+async function saveNotificationItem(item) {
+  try {
+    const res = await fetch('/api/notifications', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(item)
+    });
+    if (res.ok) return await res.json();
+  } catch (e) {}
+
+  const notifs = JSON.parse(localStorage.getItem('cu_notifications') || '[]');
+  notifs.unshift(item);
+  localStorage.setItem('cu_notifications', JSON.stringify(notifs));
+  return item;
 }
 
-function getEvents() {
+async function getEvents() {
+  try {
+    const res = await fetch('/api/events');
+    if (res.ok) return await res.json();
+  } catch (e) {}
   return JSON.parse(localStorage.getItem('cu_events') || '[]');
 }
 
-function saveEvents(data) {
-  localStorage.setItem('cu_events', JSON.stringify(data));
+async function saveEventItem(item) {
+  try {
+    const res = await fetch('/api/events', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(item)
+    });
+    if (res.ok) return await res.json();
+  } catch (e) {}
+
+  const events = JSON.parse(localStorage.getItem('cu_events') || '[]');
+  events.unshift(item);
+  localStorage.setItem('cu_events', JSON.stringify(events));
+  return item;
 }
 
-/* Render newly created admin events onto index.html grid if present */
-function renderDynamicEventsOnIndex() {
+/* Render dynamic events onto index.html grid */
+async function renderDynamicEventsOnIndex() {
   const grid = document.getElementById('opportunities-grid');
   if (!grid) return;
 
-  const events = getEvents();
-
-  // Filter custom added events (not hardcoded ones)
+  const events = await getEvents();
   const customEvents = events.filter(e => !['EV-101', 'EV-102', 'EV-103'].includes(e.id));
 
   customEvents.forEach(ev => {
-    // Avoid duplication if already rendered
     if (document.getElementById(`custom-card-${ev.id}`)) return;
 
     const div = document.createElement('div');
@@ -567,10 +582,13 @@ function initNotificationCenter() {
   });
 
   if (markReadBtn) {
-    markReadBtn.addEventListener('click', () => {
-      const notifs = getNotifications();
+    markReadBtn.addEventListener('click', async () => {
+      try {
+        await fetch('/api/notifications/read', { method: 'PATCH' });
+      } catch (e) {}
+      const notifs = await getNotifications();
       notifs.forEach(n => n.read = true);
-      saveNotifications(notifs);
+      localStorage.setItem('cu_notifications', JSON.stringify(notifs));
       renderNotifications();
     });
   }
@@ -579,18 +597,18 @@ function initNotificationCenter() {
     toastCloseBtn.addEventListener('click', () => toastEl.classList.add('hidden'));
   }
 
-  window.addEventListener('storage', (e) => {
+  window.addEventListener('storage', async (e) => {
     if (e.key === 'cu_notifications') {
-      renderNotifications();
-      const notifs = getNotifications();
+      await renderNotifications();
+      const notifs = await getNotifications();
       if (notifs.length > 0 && !notifs[0].read) {
         showToast(notifs[0].title, notifs[0].body);
       }
     }
   });
 
-  function renderNotifications() {
-    const notifs = getNotifications();
+  async function renderNotifications() {
+    const notifs = await getNotifications();
     const unread = notifs.filter(n => !n.read).length;
 
     if (badgeCountEl) badgeCountEl.textContent = unread;
@@ -703,7 +721,7 @@ function initFormValidation() {
 
   if (!form) return;
 
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const nameInput = document.getElementById('full_name');
@@ -727,48 +745,42 @@ function initFormValidation() {
     submitBtn.disabled = true;
     spinner.style.display = 'inline-block';
 
-    setTimeout(() => {
-      submitBtn.disabled = false;
-      spinner.style.display = 'none';
+    const studentName = nameInput.value.trim();
+    const studentEmail = emailInput.value.trim();
+    const selectedCourse = courseInput.value;
+    const studentPhone = phoneInput.value.trim();
+    const studentCollege = collegeInput.value.trim() || 'All India College';
+    const studentMsg = messageInput.value.trim() || 'No message provided';
 
-      const studentName = nameInput.value.trim();
-      const studentEmail = emailInput.value.trim();
-      const selectedCourse = courseInput.value;
-      const studentPhone = phoneInput.value.trim();
-      const studentCollege = collegeInput.value.trim() || 'All India College';
-      const studentMsg = messageInput.value.trim() || 'No message provided';
+    const newLead = {
+      id: 'CU-LEAD-' + Math.floor(1000 + Math.random() * 9000),
+      date: new Date().toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' }),
+      name: studentName,
+      email: studentEmail,
+      phone: studentPhone,
+      course: selectedCourse,
+      college: studentCollege,
+      message: studentMsg,
+      status: 'Pending'
+    };
 
-      const enquiries = getEnquiries();
-      const newLead = {
-        id: 'CU-LEAD-' + Math.floor(1000 + Math.random() * 9000),
-        date: new Date().toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' }),
-        name: studentName,
-        email: studentEmail,
-        phone: studentPhone,
-        course: selectedCourse,
-        college: studentCollege,
-        message: studentMsg,
-        status: 'Pending'
-      };
+    await saveEnquiryItem(newLead);
 
-      enquiries.unshift(newLead);
-      saveEnquiries(enquiries);
+    await saveNotificationItem({
+      id: 'NOTIF-' + Date.now(),
+      title: '📋 Registration Received',
+      body: `Your application for ${selectedCourse} has been submitted for review.`,
+      time: 'Just now',
+      read: false
+    });
 
-      const notifs = getNotifications();
-      notifs.unshift({
-        id: 'NOTIF-' + Date.now(),
-        title: '📋 Registration Received',
-        body: `Your application for ${selectedCourse} has been submitted for review.`,
-        time: 'Just now',
-        read: false
-      });
-      saveNotifications(notifs);
+    submitBtn.disabled = false;
+    spinner.style.display = 'none';
 
-      successMsg.innerHTML = `Congratulations <strong>${escapeHtml(studentName)}</strong>! Your entry for <strong>${escapeHtml(selectedCourse)}</strong> has been registered. You will receive a notification 🔔 when your application is accepted!`;
-      
-      successModal.classList.remove('hidden');
-      form.reset();
-    }, 1000);
+    successMsg.innerHTML = `Congratulations <strong>${escapeHtml(studentName)}</strong>! Your entry for <strong>${escapeHtml(selectedCourse)}</strong> has been registered. You will receive a notification 🔔 when your application is accepted!`;
+    
+    successModal.classList.remove('hidden');
+    form.reset();
   });
 
   if (successCloseBtn) {
@@ -944,7 +956,7 @@ function initAdminPanel() {
   // Manual Student Entry Form
   const manualForm = document.getElementById('manual-lead-form');
   if (manualForm) {
-    manualForm.addEventListener('submit', (e) => {
+    manualForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const newLead = {
         id: 'CU-LEAD-' + Math.floor(1000 + Math.random() * 9000),
@@ -958,32 +970,28 @@ function initAdminPanel() {
         status: document.getElementById('m-status').value
       };
 
-      const enquiries = getEnquiries();
-      enquiries.unshift(newLead);
-      saveEnquiries(enquiries);
+      await saveEnquiryItem(newLead);
 
       if (newLead.status === 'Confirmed') {
-        const notifs = getNotifications();
-        notifs.unshift({
+        await saveNotificationItem({
           id: 'NOTIF-' + Date.now(),
           title: '🎉 Application Accepted!',
           body: `Registration confirmed for ${newLead.name} (${newLead.course}).`,
           time: 'Just now',
           read: false
         });
-        saveNotifications(notifs);
       }
 
       window.closeAddManualLeadModal();
       manualForm.reset();
-      renderAdminDashboard();
+      await renderAdminDashboard();
     });
   }
 
   // Publish Event Form
   const addEventForm = document.getElementById('add-event-form');
   if (addEventForm) {
-    addEventForm.addEventListener('submit', (e) => {
+    addEventForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const newEv = {
         id: 'EV-' + Math.floor(100 + Math.random() * 900),
@@ -997,13 +1005,11 @@ function initAdminPanel() {
         inst: 'cu'
       };
 
-      const events = getEvents();
-      events.unshift(newEv);
-      saveEvents(events);
+      await saveEventItem(newEv);
 
       window.closeAddEventModal();
       addEventForm.reset();
-      renderAdminEvents();
+      await renderAdminEvents();
       alert('🚀 Event successfully published to Campus Opportunities!');
     });
   }
@@ -1011,20 +1017,18 @@ function initAdminPanel() {
   // Push Notification Form Dispatcher
   const pushForm = document.getElementById('push-notif-form');
   if (pushForm) {
-    pushForm.addEventListener('submit', (e) => {
+    pushForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const title = document.getElementById('p-title').value.trim();
       const body = document.getElementById('p-body').value.trim();
 
-      const notifs = getNotifications();
-      notifs.unshift({
+      await saveNotificationItem({
         id: 'NOTIF-' + Date.now(),
         title: title,
         body: body,
         time: 'Just now',
         read: false
       });
-      saveNotifications(notifs);
 
       pushForm.reset();
       alert('📢 Push notification dispatched to all students!');
@@ -1055,12 +1059,12 @@ function initAdminSidebarTabs() {
   });
 }
 
-function renderAdminDashboard() {
+async function renderAdminDashboard() {
   const tbody = document.getElementById('enquiries-tbody');
   const emptyState = document.getElementById('empty-state');
   if (!tbody) return;
 
-  const enquiries = getEnquiries();
+  const enquiries = await getEnquiries();
   
   const total = enquiries.length;
   const pending = enquiries.filter(e => e.status === 'Pending').length;
@@ -1134,11 +1138,11 @@ function renderAdminDashboard() {
   });
 }
 
-function renderAdminEvents() {
+async function renderAdminEvents() {
   const grid = document.getElementById('events-grid-admin');
   if (!grid) return;
 
-  const events = getEvents();
+  const events = await getEvents();
   grid.innerHTML = '';
 
   events.forEach(ev => {
@@ -1163,43 +1167,53 @@ function renderAdminEvents() {
   });
 }
 
-window.deleteEvent = function(id) {
+window.deleteEvent = async function(id) {
   if (confirm('Are you sure you want to delete this campus event?')) {
-    let events = getEvents();
+    try {
+      await fetch(`/api/events/${id}`, { method: 'DELETE' });
+    } catch (e) {}
+
+    let events = await getEvents();
     events = events.filter(e => e.id !== id);
-    saveEvents(events);
-    renderAdminEvents();
+    localStorage.setItem('cu_events', JSON.stringify(events));
+    await renderAdminEvents();
   }
 };
 
-function updateLeadStatus(id, newStatus) {
-  const enquiries = getEnquiries();
+async function updateLeadStatus(id, newStatus) {
+  try {
+    await fetch(`/api/enquiries/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: newStatus })
+    });
+  } catch (e) {}
+
+  const enquiries = await getEnquiries();
   const index = enquiries.findIndex(e => e.id === id);
   if (index !== -1) {
     const oldStatus = enquiries[index].status;
     enquiries[index].status = newStatus;
-    saveEnquiries(enquiries);
+    localStorage.setItem('cu_enquiries', JSON.stringify(enquiries));
 
     if (newStatus === 'Confirmed' && oldStatus !== 'Confirmed') {
       const studentName = enquiries[index].name;
       const courseName = enquiries[index].course;
-      const notifs = getNotifications();
-      notifs.unshift({
+      await saveNotificationItem({
         id: 'NOTIF-' + Date.now(),
         title: '🎉 Application Accepted!',
         body: `Congratulations ${studentName}! Your application for ${courseName} has been ACCEPTED by the Coordinator.`,
         time: 'Just now',
         read: false
       });
-      saveNotifications(notifs);
     }
 
-    renderAdminDashboard();
+    await renderAdminDashboard();
   }
 }
 
-function exportEnquiriesToCSV() {
-  const enquiries = getEnquiries();
+async function exportEnquiriesToCSV() {
+  const enquiries = await getEnquiries();
   if (enquiries.length === 0) {
     alert('No enquiry data available to export.');
     return;
