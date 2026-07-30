@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HackathonHub Admin Console | Find the Next Tech Event</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="admin-body">
+
+  <div class="admin-layout">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="admin-sidebar">
+      <div class="sidebar-header">
+        <a href="index.html" class="logo-link">
+          <img src="hackathon-hub-logo.png" alt="HackathonHub" class="official-brand-logo-img admin-logo-img" />
+          <div class="brand-text-block">
+            <span class="logo-brand-title"><span class="text-cyan">Hackathon</span><span class="text-orange">Hub</span></span>
+            <span class="logo-brand-sub" style="color: #94A3B8;">Find the Next Tech Event</span>
+          </div>
+        </a>
+        <div class="admin-tag font-bold mt-2">COORDINATOR PORTAL</div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <button class="sidebar-link active" data-tab="tab-registrations">
+          <span class="nav-icon">📋</span>
+          <span>Student Applications</span>
+        </button>
+        <button class="sidebar-link" data-tab="tab-events">
+          <span class="nav-icon">🏆</span>
+          <span>Manage Campus Events</span>
+        </button>
+        <button class="sidebar-link" data-tab="tab-calendar">
+          <span class="nav-icon">📅</span>
+          <span>Upcoming Events Schedule</span>
+        </button>
+        <button class="sidebar-link" data-tab="tab-notifications">
+          <span class="nav-icon">📢</span>
+          <span>Push Notifications</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="index.html" class="btn btn-outline btn-full btn-sm">
+          <span>&larr; View Student Portal</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Admin Content Area -->
+    <main class="admin-main">
+      
+      <!-- Top Header Bar -->
+      <header class="admin-topbar">
+        <div class="topbar-welcome">
+          <h2>HackathonHub Coordinator Console</h2>
+          <p class="text-muted">Find the Next Tech Event — Manage student applications and campus event publishing.</p>
+        </div>
+
+        <div class="topbar-actions">
+          <button class="btn btn-secondary btn-sm" id="btn-export-csv" onclick="exportEnquiriesToCSV()">
+            <span>📥 Export to CSV</span>
+          </button>
+          <button class="btn btn-primary btn-sm" id="btn-add-manual" onclick="openAddManualLeadModal()">
+            <span>+ Add Student Entry</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Stat Cards Grid -->
+      <section class="admin-stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon-wrap bg-blue">📋</div>
+          <div class="stat-meta">
+            <span class="stat-label">Total Applications</span>
+            <h3 class="stat-number" id="stat-total">0</h3>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon-wrap bg-gold">⏳</div>
+          <div class="stat-meta">
+            <span class="stat-label">Pending Review</span>
+            <h3 class="stat-number" id="stat-pending">0</h3>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon-wrap bg-green">🎉</div>
+          <div class="stat-meta">
+            <span class="stat-label">Confirmed Acceptances</span>
+            <h3 class="stat-number" id="stat-confirmed">0</h3>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon-wrap bg-red">💰</div>
+          <div class="stat-meta">
+            <span class="stat-label">Est. Revenue / Pool</span>
+            <h3 class="stat-number" id="stat-revenue">₹0</h3>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 1: STUDENT REGISTRATIONS TABLE -->
+      <div class="admin-tab-content active" id="tab-registrations">
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <div>
+              <h3>Student Applications & Enquiries</h3>
+              <p class="text-muted">Review, accept applications, or update lead status in real time.</p>
+            </div>
+          </div>
+
+          <!-- Controls & Filters Bar -->
+          <div class="admin-filter-bar">
+            <div class="search-input-wrap">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="admin-search" class="form-input" placeholder="Search by student name, email, phone, or college..." />
+            </div>
+
+            <div class="filter-dropdowns">
+              <select id="filter-course" class="form-select">
+                <option value="all">All Opportunity Tracks</option>
+                <option value="IIT Bombay Techfest AI Hackathon [FREE]">IIT Bombay Techfest AI Hackathon [FREE]</option>
+                <option value="CU HackNation 2026 [FREE]">CU HackNation 2026 [FREE]</option>
+                <option value="IIT Delhi Tryst Coding Sprint [FREE]">IIT Delhi Tryst Coding Sprint [FREE]</option>
+                <option value="AIIMS MedTech Innovation Summit [FREE]">AIIMS MedTech Innovation Summit [FREE]</option>
+                <option value="BITS Pilani APOGEE Case Challenge [FREE]">BITS Pilani APOGEE Case Challenge [FREE]</option>
+                <option value="CU Super-30 Placement Challenge [FREE]">CU Super-30 Placement Challenge [FREE]</option>
+                <option value="Agentic & Generative AI Workshop [PAID]">Agentic & Generative AI Workshop [PAID]</option>
+                <option value="Cybersecurity & Ethical Hacking Workshop [PAID]">Cybersecurity & Ethical Hacking Workshop [PAID]</option>
+              </select>
+
+              <select id="filter-status" class="form-select">
+                <option value="all">All Statuses</option>
+                <option value="Pending">Pending Review</option>
+                <option value="Contacted">Contacted</option>
+                <option value="Confirmed">Confirmed (Accepted)</option>
+                <option value="Cancelled">Cancelled</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Data Table -->
+          <div class="table-responsive">
+            <table class="admin-table" id="enquiries-table">
+              <thead>
+                <tr>
+                  <th>Lead ID</th>
+                  <th>Date & Time</th>
+                  <th>Student Info</th>
+                  <th>Opportunity Track</th>
+                  <th>College / University</th>
+                  <th>Status</th>
+                  <th>Quick Action</th>
+                </tr>
+              </thead>
+              <tbody id="enquiries-tbody">
+                <!-- Injected via JavaScript -->
+              </tbody>
+            </table>
+
+            <div id="empty-state" class="empty-state text-center hidden">
+              <div class="empty-icon">📭</div>
+              <h4>No Enquiries Match Your Filters</h4>
+              <p class="text-muted">Try adjusting your search keywords or clearing filters.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: MANAGE CAMPUS EVENTS (CRUD) -->
+      <div class="admin-tab-content hidden" id="tab-events">
+        <div class="admin-card">
+          <div class="admin-card-header flex-between">
+            <div>
+              <h3>HackathonHub Event Catalog</h3>
+              <p class="text-muted">Publish, edit, or remove hackathons, workshops, and placement challenges.</p>
+            </div>
+            <button class="btn btn-primary btn-sm" id="btn-create-event" onclick="openAddEventModal()">+ Publish New Event</button>
+          </div>
+
+          <div class="events-grid-admin" id="events-grid-admin">
+            <!-- Dynamically Rendered via JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: UPCOMING EVENTS SCHEDULE -->
+      <div class="admin-tab-content hidden" id="tab-calendar">
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h3>Upcoming Tech Events & Summit Schedule (2026-27)</h3>
+            <p class="text-muted">Official timeline for national hackathons, VAC bootcamp weeks, and semester milestones.</p>
+          </div>
+
+          <div class="calendar-admin-list">
+            <div class="cal-admin-item">
+              <span class="cal-badge bg-gold">★ VAC WEEK</span>
+              <div>
+                <strong>05 OCT - 09 OCT 2026</strong>
+                <p>Value Added Courses (VAC) Week & Practical Edufabrica Bootcamps.</p>
+              </div>
+            </div>
+            <div class="cal-admin-item">
+              <span class="cal-badge bg-blue">ORIENTATION</span>
+              <div>
+                <strong>23 JUL - 29 JUL 2026</strong>
+                <p>Orientation & Tech Induction (Batch 2026).</p>
+              </div>
+            </div>
+            <div class="cal-admin-item">
+              <span class="cal-badge bg-teal">TEST-1</span>
+              <div>
+                <strong>24 AUG - 29 AUG 2026</strong>
+                <p>In Semester Test 1 (IST-1) evaluations.</p>
+              </div>
+            </div>
+            <div class="cal-admin-item">
+              <span class="cal-badge bg-purple">TEST-2</span>
+              <div>
+                <strong>12 OCT - 17 OCT 2026</strong>
+                <p>In Semester Test 2 (IST-2) evaluations.</p>
+              </div>
+            </div>
+            <div class="cal-admin-item">
+              <span class="cal-badge bg-red">EXAMS</span>
+              <div>
+                <strong>23 NOV - 19 DEC 2026</strong>
+                <p>End Semester Theory Examinations.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 4: PUSH NOTIFICATIONS DISPATCHER -->
+      <div class="admin-tab-content hidden" id="tab-notifications">
+        <div class="admin-card max-w-600">
+          <div class="admin-card-header">
+            <h3>Push Notification Dispatcher</h3>
+            <p class="text-muted">Send live announcement notifications to students on the Student Portal.</p>
+          </div>
+
+          <form id="push-notif-form" class="enquiry-form">
+            <div class="form-group">
+              <label for="p-title" class="form-label">Notification Title *</label>
+              <input type="text" id="p-title" class="form-input" placeholder="e.g. 🎉 Special Hackathon Alert!" required />
+            </div>
+
+            <div class="form-group">
+              <label for="p-body" class="form-label">Notification Message *</label>
+              <textarea id="p-body" class="form-textarea" placeholder="Enter notification message for students..." rows="3" required></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-full">Dispatch Push Notification 🚀</button>
+          </form>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Modal: View Full Student Details -->
+  <div class="modal-backdrop hidden" id="view-student-modal">
+    <div class="modal-card">
+      <button class="modal-close" onclick="closeViewStudentModal()">&times;</button>
+      <span class="modal-badge">STUDENT APPLICATION PROFILE</span>
+      <h3 class="modal-title" id="v-title">Applicant Full Details</h3>
+      
+      <div class="student-profile-details mt-3" id="v-content">
+        <!-- Injected via JavaScript -->
+      </div>
+
+      <div class="modal-footer flex-between mt-4">
+        <button class="btn btn-secondary btn-sm" onclick="closeViewStudentModal()">Close Profile</button>
+        <button class="btn btn-primary btn-sm" id="v-accept-btn">Accept & Send Notification 🎉</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Add Manual Lead -->
+  <div class="modal-backdrop hidden" id="manual-lead-modal">
+    <div class="modal-card">
+      <button class="modal-close" id="modal-manual-close" onclick="closeAddManualLeadModal()">&times;</button>
+      <span class="modal-badge">COORDINATOR ENTRY</span>
+      <h3 class="modal-title">Add Manual Student Application</h3>
+      
+      <form id="manual-lead-form" class="enquiry-form mt-3">
+        <div class="form-group">
+          <label for="m-name" class="form-label">Student Name *</label>
+          <input type="text" id="m-name" class="form-input" placeholder="e.g. Vikram Singh" required />
+        </div>
+
+        <div class="form-group">
+          <label for="m-email" class="form-label">Email Address *</label>
+          <input type="email" id="m-email" class="form-input" placeholder="vikram@cuchd.in" required />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group col-half">
+            <label for="m-phone" class="form-label">Phone Number *</label>
+            <input type="tel" id="m-phone" class="form-input" placeholder="9876543210" required maxLength="10" />
+          </div>
+
+          <div class="form-group col-half">
+            <label for="m-status" class="form-label">Initial Status</label>
+            <select id="m-status" class="form-select">
+              <option value="Confirmed" selected>Confirmed (Accept)</option>
+              <option value="Pending">Pending</option>
+              <option value="Contacted">Contacted</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="m-course" class="form-label">Opportunity Track *</label>
+          <select id="m-course" class="form-select" required>
+            <option value="IIT Bombay Techfest AI Hackathon [FREE]">IIT Bombay Techfest AI Hackathon [FREE]</option>
+            <option value="CU HackNation 2026 [FREE]" selected>CU HackNation 2026 [FREE]</option>
+            <option value="IIT Delhi Tryst Coding Sprint [FREE]">IIT Delhi Tryst Coding Sprint [FREE]</option>
+            <option value="AIIMS MedTech Innovation Summit [FREE]">AIIMS MedTech Innovation Summit [FREE]</option>
+            <option value="BITS Pilani APOGEE Case Challenge [FREE]">BITS Pilani APOGEE Case Challenge [FREE]</option>
+            <option value="CU Super-30 Placement Challenge [FREE]">CU Super-30 Placement Challenge [FREE]</option>
+            <option value="Agentic & Generative AI Workshop [PAID]">Agentic & Generative AI Workshop [PAID]</option>
+            <option value="Cybersecurity & Ethical Hacking Workshop [PAID]">Cybersecurity & Ethical Hacking Workshop [PAID]</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="m-college" class="form-label">College / University</label>
+          <input type="text" id="m-college" class="form-input" placeholder="Chandigarh University" />
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-full mt-3">Save Student Entry</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Create / Publish New Event -->
+  <div class="modal-backdrop hidden" id="add-event-modal">
+    <div class="modal-card">
+      <button class="modal-close" id="modal-event-close" onclick="closeAddEventModal()">&times;</button>
+      <span class="modal-badge">EVENT MANAGER</span>
+      <h3 class="modal-title">Publish New Event / Opportunity</h3>
+      
+      <form id="add-event-form" class="enquiry-form mt-3">
+        <div class="form-group">
+          <label for="ev-title" class="form-label">Event Title *</label>
+          <input type="text" id="ev-title" class="form-input" placeholder="e.g. National Quantum Computing Hackathon" required />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group col-half">
+            <label for="ev-category" class="form-label">Category *</label>
+            <select id="ev-category" class="form-select" required>
+              <option value="hackathon">🏆 Hackathon & Coding</option>
+              <option value="workshop">🛠️ Technical Workshop</option>
+              <option value="case">💡 Case Competition</option>
+              <option value="hiring">💼 Hiring Drive</option>
+              <option value="cultural">🎨 Cultural Fest</option>
+            </select>
+          </div>
+
+          <div class="form-group col-half">
+            <label for="ev-fee" class="form-label">Fee Type *</label>
+            <select id="ev-fee" class="form-select" required>
+              <option value="free">🎁 FREE Registration</option>
+              <option value="paid">📜 Paid Workshop</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group col-half">
+            <label for="ev-organizer" class="form-label">Organizer / College *</label>
+            <input type="text" id="ev-organizer" class="form-input" placeholder="e.g. Chandigarh University" required />
+          </div>
+
+          <div class="form-group col-half">
+            <label for="ev-prize" class="form-label">Prize / Reward *</label>
+            <input type="text" id="ev-prize" class="form-input" placeholder="e.g. ₹2,00,000 Cash" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="ev-desc" class="form-label">Event Description</label>
+          <textarea id="ev-desc" class="form-textarea" placeholder="Enter brief summary..." rows="2"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-full mt-3">Publish to Student Portal</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
