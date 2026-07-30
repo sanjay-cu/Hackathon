@@ -229,6 +229,30 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; }
   color: var(--primary-bright-blue); cursor: pointer; text-decoration: underline;
 }
 
+/* ADMIN AUTHENTICATION LOGIN SCREEN STYLES */
+.admin-auth-wrapper {
+  min-height: 100vh; display: flex; align-items: center; justify-content: center;
+  background: radial-gradient(circle at 50% 30%, #1E293B 0%, #0F172A 50%, #070B19 100%);
+  padding: 1.5rem;
+}
+
+.auth-card {
+  background-color: #FFFFFF; color: #0F172A; border-radius: var(--radius-lg);
+  padding: 3rem 2.5rem; max-width: 460px; width: 100%;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4), 0 0 0 2px var(--border-cyber);
+  border: 1.5px solid var(--border-light); animation: modalPop 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.auth-title { font-family: var(--font-heading); font-size: 1.7rem; font-weight: 800; color: #0F172A; margin-bottom: 0.35rem; }
+.auth-badge { font-size: 0.725rem; font-weight: 900; color: var(--brand-orange); letter-spacing: 0.08em; background: rgba(255, 145, 0, 0.1); padding: 0.25rem 0.75rem; border-radius: var(--radius-full); display: inline-block; }
+.auth-desc { font-size: 0.9rem; color: #64748B; line-height: 1.5; }
+
+.auth-error-alert {
+  background-color: #FEF2F2; color: #991B1B; border: 1.5px solid #F87171;
+  padding: 0.85rem 1rem; border-radius: var(--radius-md); font-size: 0.875rem;
+  font-weight: 800; text-align: center; margin-bottom: 1.25rem;
+}
+
 /* NOTIFICATION ITEMS INSIDE DROPDOWN */
 .notif-actions-bar { display: flex; justify-content: space-between; align-items: center; padding: 0.65rem 1rem; background-color: var(--bg-light); border-radius: var(--radius-md); margin-bottom: 1.15rem; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); }
 .notif-list { display: flex; flex-direction: column; gap: 0.75rem; max-height: 380px; overflow-y: auto; }

@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   renderDynamicEventsOnIndex();
 
   if (document.querySelector('.admin-body')) {
+    initAdminAuth();
     initAdminPanel();
   }
 });
@@ -44,6 +45,11 @@ window.closeAddManualLeadModal = function() {
 window.closeViewStudentModal = function() {
   const modal = document.getElementById('view-student-modal');
   if (modal) modal.classList.add('hidden');
+};
+
+window.logoutAdmin = function() {
+  sessionStorage.removeItem('admin_authenticated');
+  location.reload();
 };
 
 window.viewStudentDetails = async function(id) {
@@ -100,6 +106,67 @@ window.viewStudentDetails = async function(id) {
 
   if (modal) modal.classList.remove('hidden');
 };
+
+/* --------------------------------------------------------------------------
+   ADMIN AUTHENTICATION SYSTEM
+   -------------------------------------------------------------------------- */
+function initAdminAuth() {
+  const authScreen = document.getElementById('admin-auth-screen');
+  const mainLayout = document.getElementById('admin-main-layout');
+  const loginForm = document.getElementById('admin-login-form');
+  const errorMsg = document.getElementById('auth-error-msg');
+
+  if (!authScreen || !mainLayout) return;
+
+  const isAuth = sessionStorage.getItem('admin_authenticated') === 'true';
+
+  if (isAuth) {
+    authScreen.classList.add('hidden');
+    mainLayout.classList.remove('hidden');
+  } else {
+    authScreen.classList.remove('hidden');
+    mainLayout.classList.add('hidden');
+  }
+
+  if (loginForm) {
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('admin_email').value.trim();
+      const password = document.getElementById('admin_password').value;
+
+      try {
+        const res = await fetch('/api/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          sessionStorage.setItem('admin_authenticated', 'true');
+          authScreen.classList.add('hidden');
+          mainLayout.classList.remove('hidden');
+          if (errorMsg) errorMsg.classList.add('hidden');
+          renderAdminDashboard();
+          renderAdminEvents();
+          return;
+        }
+      } catch (err) {}
+
+      // Fallback verification
+      if (email === 'sanjayatchoudhary0@gmail.com' && password === 'Sanjay@935129') {
+        sessionStorage.setItem('admin_authenticated', 'true');
+        authScreen.classList.add('hidden');
+        mainLayout.classList.remove('hidden');
+        if (errorMsg) errorMsg.classList.add('hidden');
+        renderAdminDashboard();
+        renderAdminEvents();
+      } else {
+        if (errorMsg) errorMsg.classList.remove('hidden');
+      }
+    });
+  }
+}
 
 /* --------------------------------------------------------------------------
    0. Database Sync Engine (MongoDB Atlas API + LocalStorage Fallback)

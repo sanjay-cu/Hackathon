@@ -6,7 +6,7 @@ const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 8080;
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://sanjay:sanjay123@cluster0.ydynxul.mongodb.net/hackathonhub?retryWrites=true&w=majority';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://hackathonhub:sanjay123@cluster0.ydynxul.mongodb.net/hackathonhub?retryWrites=true&w=majority';
 
 // Middleware
 app.use(cors());
@@ -66,6 +66,16 @@ const Notification = mongoose.model('Notification', notificationSchema);
 /* --------------------------------------------------------------------------
    REST API Endpoints
    -------------------------------------------------------------------------- */
+
+// --- ADMIN AUTHENTICATION ---
+app.post('/api/admin/login', (req, res) => {
+  const { email, password } = req.body;
+  if (email === 'sanjayatchoudhary0@gmail.com' && password === 'Sanjay@935129') {
+    res.json({ success: true, token: 'ADMIN_SECURE_TOKEN_935129', user: 'sanjayatchoudhary0@gmail.com' });
+  } else {
+    res.status(401).json({ success: false, message: 'Invalid Admin Email or Password' });
+  }
+});
 
 // --- ENQUIRIES / APPLICATIONS ---
 app.get('/api/enquiries', async (req, res) => {

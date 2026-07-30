@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HackathonHub Admin Console | Find the Next Tech Event</title>
+  <title>HackathonHub Admin Console | Restricted Access</title>
   
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -15,7 +15,52 @@
 </head>
 <body class="admin-body">
 
-  <div class="admin-layout">
+  <!-- ADMIN AUTHENTICATION LOGIN SCREEN (SHOWN WHEN NOT LOGGED IN) -->
+  <div id="admin-auth-screen" class="admin-auth-wrapper">
+    <div class="auth-card">
+      <div class="auth-header text-center">
+        <a href="index.html" class="logo-link" style="justify-content: center; margin-bottom: 1rem;">
+          <img src="hackathon-hub-logo.png" alt="HackathonHub" class="official-brand-logo-img" style="height: 60px;" />
+        </a>
+        <h2 class="auth-title"><span class="text-cyan">Hackathon</span><span class="text-orange">Hub</span> Admin Console</h2>
+        <div class="auth-badge">🔒 RESTRICTED AUTHORIZED ACCESS ONLY</div>
+        <p class="auth-desc mt-2">Enter your verified coordinator credentials to unlock the management console.</p>
+      </div>
+
+      <form id="admin-login-form" class="enquiry-form mt-4">
+        <div id="auth-error-msg" class="auth-error-alert hidden">
+          ❌ Invalid Admin Email or Password! Access Denied.
+        </div>
+
+        <div class="form-group">
+          <label for="admin_email" class="form-label">Coordinator Email Address *</label>
+          <div class="input-with-icon">
+            <span class="input-icon">✉️</span>
+            <input type="email" id="admin_email" class="form-input" placeholder="sanjayatchoudhary0@gmail.com" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="admin_password" class="form-label">Admin Security Password *</label>
+          <div class="input-with-icon">
+            <span class="input-icon">🔑</span>
+            <input type="password" id="admin_password" class="form-input" placeholder="••••••••••••" required />
+          </div>
+        </div>
+
+        <button type="submit" id="btn-admin-login" class="btn btn-primary btn-full mt-3">
+          <span>Unlock Admin Console 🔓</span>
+        </button>
+
+        <div class="text-center mt-3">
+          <a href="index.html" class="btn-text-link" style="color: var(--text-light);">&larr; Return to Student Portal</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MAIN ADMIN DASHBOARD LAYOUT (HIDDEN UNTIL AUTHENTICATED) -->
+  <div class="admin-layout hidden" id="admin-main-layout">
     
     <!-- Sidebar Navigation -->
     <aside class="admin-sidebar">
@@ -49,8 +94,11 @@
         </button>
       </nav>
 
-      <div class="sidebar-footer">
-        <a href="index.html" class="btn btn-outline btn-full btn-sm">
+      <div class="sidebar-footer" style="display: flex; flex-direction: column; gap: 0.75rem;">
+        <button class="btn btn-outline btn-full btn-sm" onclick="logoutAdmin()" style="border-color: #EF4444; color: #F87171;">
+          <span>🔒 Logout Console</span>
+        </button>
+        <a href="index.html" class="btn btn-secondary btn-full btn-sm" style="text-align: center;">
           <span>&larr; View Student Portal</span>
         </a>
       </div>
@@ -63,7 +111,7 @@
       <header class="admin-topbar">
         <div class="topbar-welcome">
           <h2>HackathonHub Coordinator Console</h2>
-          <p class="text-muted">Find the Next Tech Event — Manage student applications and campus event publishing.</p>
+          <p class="text-muted">Logged in as: <strong style="color: var(--brand-cyan);">sanjayatchoudhary0@gmail.com</strong></p>
         </div>
 
         <div class="topbar-actions">
