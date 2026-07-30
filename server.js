@@ -175,7 +175,11 @@ app.use((req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Start Express Server
-app.listen(PORT, () => {
-  console.log(`🚀 HackathonHub Server running live at http://localhost:${PORT}`);
-});
+// Start Express Server for Local Development
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`🚀 HackathonHub Server running live at http://localhost:${PORT}`);
+  });
+}
+
+module.exports = app;
