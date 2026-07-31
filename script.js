@@ -423,7 +423,6 @@ async function renderDynamicEventsOnIndex() {
     grid.prepend(div);
   });
 
-  // Re-run dropdown populator so new cards are added instantly!
   await populateOpportunityDropdowns();
 }
 
@@ -639,7 +638,7 @@ function resetAllFilters() {
 }
 
 /* --------------------------------------------------------------------------
-   3. STUDENT NOTIFICATION POPOVER DROPDOWN (INSTANT REAL-TIME SYNC)
+   3. STUDENT NOTIFICATION POPOVER DROPDOWN
    -------------------------------------------------------------------------- */
 function initNotificationCenter() {
   const bellBtn = document.getElementById('notif-bell-btn');
@@ -651,8 +650,6 @@ function initNotificationCenter() {
   const notifListEl = document.getElementById('notif-list');
 
   const toastEl = document.getElementById('notif-toast');
-  const toastTitleEl = document.getElementById('toast-title');
-  const toastBodyEl = document.getElementById('toast-body');
   const toastCloseBtn = document.getElementById('toast-close-btn');
 
   renderNotifications();
@@ -673,7 +670,6 @@ function initNotificationCenter() {
     }
   });
 
-  // INSTANT MARK ALL AS READ (0ms REAL-TIME SYNC)
   if (markReadBtn) {
     markReadBtn.addEventListener('click', async (e) => {
       e.preventDefault();
@@ -775,13 +771,12 @@ function initLiveAnnouncementSync() {
 }
 
 /* --------------------------------------------------------------------------
-   5. Student Registration Form Submission with Live Event Selector
+   5. Student Registration Form Submission
    -------------------------------------------------------------------------- */
 function initRegisterTriggers() {
   const courseSelect = document.getElementById('course');
   const enquiryForm = document.getElementById('enquiry-form');
 
-  // Delegated click listener for ALL Register Now buttons on any opportunity card
   document.addEventListener('click', (e) => {
     const btn = e.target.closest('.register-trigger-btn');
     if (btn && courseSelect) {
@@ -801,7 +796,6 @@ function initRegisterTriggers() {
         }
 
         if (!matched) {
-          // Add exact event name to dropdown dynamically & select it
           const newOpt = document.createElement('option');
           newOpt.value = eventName;
           newOpt.textContent = eventName;
@@ -830,7 +824,6 @@ function initRegisterTriggers() {
 
       await saveEnquiryItem(newApplication);
 
-      // Show success modal
       const modal = document.getElementById('success-modal');
       const modalMsg = document.getElementById('success-modal-msg');
       if (modalMsg) {
@@ -884,6 +877,9 @@ function initMobileDrawer() {
   });
 }
 
+/* --------------------------------------------------------------------------
+   7. STUDENT REVIEW COMMENTS & ADMIN APPROVAL MODERATION ENGINE
+   -------------------------------------------------------------------------- */
 async function getReviews() {
   try {
     const res = await fetch('/api/reviews');
@@ -928,6 +924,7 @@ function initStudentReviewCarousel() {
       const stars = '⭐'.repeat(ratingVal);
       const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2) || 'ST';
 
+      // SUBMIT WITH PENDING STATUS (REQUIRES ADMIN APPROVAL TO BE VISIBLE LIVE)
       const newReview = {
         id: 'REV-' + Date.now(),
         name,
@@ -935,7 +932,8 @@ function initStudentReviewCarousel() {
         rating: stars,
         comment,
         initials,
-        date: getLiveDateTimeString()
+        date: getLiveDateTimeString(),
+        status: 'Pending'
       };
 
       await saveReviewItem(newReview);
@@ -943,19 +941,21 @@ function initStudentReviewCarousel() {
 
       await saveNotificationItem({
         id: 'NOTIF-' + Date.now(),
-        title: '💬 New Student Review Posted!',
-        body: `${name} (${detail}) posted a review: "${comment}"`,
+        title: '💬 New Student Comment Pending Approval',
+        body: `${name} (${detail}) submitted a review: "${comment}". Awaiting admin approval.`,
         time: 'Just now',
         read: false
       });
 
-      await renderReviews();
-      showToastNotification('💬 Review Posted Live!', `Thank you ${name}! Your comment is now live on the student portal.`);
+      showToastNotification('⌛ Review Submitted for Approval!', `Thank you ${name}! Your comment has been sent to the Admin queue for approval.`);
+      alert(`⌛ Thank you ${name}!\nYour experience review has been submitted to the Admin approval queue. It will be published live on the Student Panel as soon as the coordinator approves it!`);
     });
   }
 
   async function renderReviews() {
     const customReviews = await getReviews();
+    // Only render reviews approved by admin (plus default verified student reviews)
+    const approvedReviews = customReviews.filter(r => r.status === 'Approved');
 
     let html = `
       <div class="testimonial-card active">
@@ -993,7 +993,7 @@ function initStudentReviewCarousel() {
       </div>
     `;
 
-    customReviews.forEach(r => {
+    approvedReviews.forEach(r => {
       html += `
         <div class="testimonial-card">
           <div class="t-quote-mark">&ldquo;</div>
@@ -1159,12 +1159,13 @@ function initFaqAccordion() {
 }
 
 /* --------------------------------------------------------------------------
-   10. ENTERPRISE ADMIN PANEL DASHBOARD ENGINE
+   10. ENTERPRISE ADMIN PANEL DASHBOARD ENGINE & REVIEW MODERATION QUEUE
    -------------------------------------------------------------------------- */
 function initAdminPanel() {
   initAdminSidebarTabs();
   renderAdminDashboard();
   renderAdminEvents();
+  renderAdminReviews();
   populateOpportunityDropdowns();
 
   const searchInput = document.getElementById('admin-search');
@@ -1278,6 +1279,77 @@ function initAdminPanel() {
       alert('📢 Push notification dispatched live to all students!');
     });
   }
+}
+
+async function renderAdminReviews() {
+  const tbody = document.getElementById('reviews-tbody');
+  const emptyState = document.getElementById('reviews-empty-state');
+  if (!tbody) return;
+
+  const reviews = await getReviews();
+  tbody.innerHTML = '';
+
+  if (reviews.length === 0) {
+    if (emptyState) emptyState.classList.remove('hidden');
+    return;
+  } else {
+    if (emptyState) emptyState.classList.add('hidden');
+  }
+
+  reviews.forEach(r => {
+    const isApproved = r.status === 'Approved';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><strong style="color: var(--brand-cyan);">${escapeHtml(r.id)}</strong></td>
+      <td><strong>${escapeHtml(r.name)}</strong></td>
+      <td>${escapeHtml(r.detail)}</td>
+      <td>${r.rating}</td>
+      <td style="max-width: 250px;">"${escapeHtml(r.comment)}"</td>
+      <td>
+        <span class="status-pill ${isApproved ? 'status-confirmed' : 'status-pending'}">${isApproved ? 'APPROVED & LIVE' : 'PENDING APPROVAL'}</span>
+      </td>
+      <td>
+        <div style="display: flex; gap: 0.4rem;">
+          ${!isApproved ? `<button class="btn btn-primary btn-sm" onclick="approveStudentReview('${r.id}')">✓ Approve & Publish</button>` : ''}
+          <button class="btn btn-secondary btn-sm" onclick="deleteStudentReview('${r.id}')" style="color: #EF4444; border-color: #FCA5A5;">🗑️ Delete</button>
+        </div>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+async function approveStudentReview(id) {
+  try {
+    await fetch(`/api/reviews/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: 'Approved' })
+    });
+  } catch (e) {}
+
+  const reviews = await getReviews();
+  const rev = reviews.find(r => r.id === id);
+  if (rev) {
+    rev.status = 'Approved';
+    localStorage.setItem('cu_reviews', JSON.stringify(reviews));
+  }
+
+  await renderAdminReviews();
+  alert('✅ Student review approved & published live on the Student Panel!');
+}
+
+async function deleteStudentReview(id) {
+  try {
+    await fetch(`/api/reviews/${id}`, { method: 'DELETE' });
+  } catch (e) {}
+
+  const reviews = await getReviews();
+  const filtered = reviews.filter(r => r.id !== id);
+  localStorage.setItem('cu_reviews', JSON.stringify(filtered));
+
+  await renderAdminReviews();
+  alert('🗑️ Student review removed.');
 }
 
 function initAdminSidebarTabs() {

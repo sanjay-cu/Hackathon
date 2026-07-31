@@ -218,6 +218,10 @@
           <span class="nav-icon">🔔</span>
           <span>Push Notifications</span>
         </button>
+        <button class="sidebar-link" data-tab="tab-reviews">
+          <span class="nav-icon">💬</span>
+          <span>Moderate Student Reviews</span>
+        </button>
       </nav>
 
       <div class="sidebar-footer" style="display: flex; flex-direction: column; gap: 0.75rem;">
@@ -457,6 +461,43 @@
 
             <button type="submit" class="btn btn-primary btn-full">Dispatch Push Notification 🚀</button>
           </form>
+        </div>
+      </div>
+
+      <!-- TAB 6: MODERATE STUDENT REVIEWS & COMMENTS -->
+      <div class="admin-tab-content hidden" id="tab-reviews">
+        <div class="admin-card">
+          <div class="admin-card-header flex-between">
+            <div>
+              <h3>Student Comments & Review Moderation Queue</h3>
+              <p class="text-muted">Approve or reject student comments before they appear live on the student portal.</p>
+            </div>
+          </div>
+
+          <div class="table-responsive mt-3">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Review ID</th>
+                  <th>Student Info</th>
+                  <th>Branch & University</th>
+                  <th>Rating</th>
+                  <th>Comment Text</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="reviews-tbody">
+                <!-- Injected via JS -->
+              </tbody>
+            </table>
+
+            <div id="reviews-empty-state" class="empty-state text-center hidden">
+              <div class="empty-icon" style="font-size: 2.5rem; margin-bottom: 0.5rem;">💬</div>
+              <h4 style="font-family: var(--font-heading); font-size: 1.2rem; color: var(--primary-navy);">No Student Reviews Pending Approval</h4>
+              <p class="text-muted">All submitted comments have been moderated.</p>
+            </div>
+          </div>
         </div>
       </div>
 

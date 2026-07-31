@@ -59,6 +59,9 @@ const notificationSchema = new mongoose.Schema({
   body: { type: String, required: true },
   time: { type: String, default: 'Just now' },
   read: { type: Boolean, default: false }
+});
+const Notification = mongoose.model('Notification', notificationSchema);
+
 // 4. Student Review Schema
 const reviewSchema = new mongoose.Schema({
   id: { type: String, required: true, unique: true },
@@ -67,7 +70,8 @@ const reviewSchema = new mongoose.Schema({
   rating: { type: String, default: '⭐⭐⭐⭐⭐' },
   comment: { type: String, required: true },
   initials: { type: String, default: 'ST' },
-  date: { type: String }
+  date: { type: String },
+  status: { type: String, default: 'Pending' } // Pending, Approved, Rejected
 }, { timestamps: true });
 
 const Review = mongoose.model('Review', reviewSchema);
@@ -149,9 +153,9 @@ app.post('/api/events', async (req, res) => {
 app.delete('/api/events/:id', async (req, res) => {
   try {
     await Event.findOneAndDelete({ id: req.params.id });
-    res.json({ message: 'Event deleted successfully' });
+    res.json({ success: true, message: 'Event deleted' });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -201,6 +205,29 @@ app.post('/api/reviews', async (req, res) => {
     res.status(201).json(review);
   } catch (err) {
     res.status(400).json({ error: err.message });
+  }
+});
+
+app.patch('/api/reviews/:id', async (req, res) => {
+  try {
+    const { status } = req.body;
+    const review = await Review.findOneAndUpdate(
+      { id: req.params.id },
+      { status },
+      { new: true }
+    );
+    res.json(review);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.delete('/api/reviews/:id', async (req, res) => {
+  try {
+    await Review.findOneAndDelete({ id: req.params.id });
+    res.json({ success: true, message: 'Review deleted' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 
