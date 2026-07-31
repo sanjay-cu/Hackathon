@@ -26,11 +26,14 @@
         <span class="badge-new">LIVE ANNOUNCEMENT</span>
         <span class="announcement-text">CU HackNation 2026 & IIT Bombay Techfest AI Registrations Open!</span>
       </div>
-      <a href="#opportunities" class="announcement-link">Explore Opportunities &rarr;</a>
+      <div class="announcement-right" style="display: flex; gap: 1.25rem; align-items: center;">
+        <a href="#opportunities" class="announcement-link">Explore Opportunities &rarr;</a>
+        <a href="admin.html" class="announcement-admin-link" target="_blank" style="color: #FF9100; font-weight: 800; font-size: 0.8rem; text-decoration: underline;">🔐 Coordinator Access</a>
+      </div>
     </div>
   </div>
 
-  <!-- Header / Navigation (Ultra-Sleek Glassmorphic Navbar) -->
+  <!-- Header / Navigation (Clean Public Student Navbar - No Admin Panel Button) -->
   <header class="site-header" id="site-header">
     <div class="container header-container">
       <div class="brand-group">
@@ -52,7 +55,6 @@
         <a href="#partners" class="nav-link">Partners</a>
         <a href="#reviews" class="nav-link">Reviews</a>
         <a href="#verify" class="nav-link">Verify Cert</a>
-        <a href="admin.html" class="nav-link admin-nav-highlight" target="_blank">🔐 Admin Console</a>
       </nav>
 
       <div class="header-actions">
@@ -123,12 +125,11 @@
       <a href="#partners" class="drawer-link">Partner Institutions</a>
       <a href="#reviews" class="drawer-link">Student Reviews</a>
       <a href="#verify" class="drawer-link">Certificate Verification</a>
-      <a href="admin.html" class="drawer-link" style="color: #FF9100; font-weight: 800;">🔐 Coordinator Admin Panel</a>
       <a href="#register" class="btn btn-primary btn-full mt-4">Register / Submit Entry</a>
     </div>
   </aside>
 
-  <!-- Hero Section with Cyber Grid & Intelligent Auto-Suggest Search -->
+  <!-- Hero Section with 2-Column Grid & Live Coders Showcase Graphic -->
   <section class="hero-section" id="hero">
     <div class="hero-bg-grid"></div>
     <div class="hero-light-orbs">
@@ -137,64 +138,96 @@
     </div>
 
     <div class="container hero-container">
-      <div class="hero-content">
-        <div class="hero-badge-pill">
-          <span class="pulse-ring"></span>
-          <span class="badge-pill-text">🚀 HackathonHub • Find the Next Tech Event Across India</span>
-        </div>
-
-        <h1 class="hero-title">
-          Find the Next Tech Event Across <span class="gradient-text-cyan">All India Universities</span>
-        </h1>
-
-        <p class="hero-subtitle">
-          Discover 100% FREE national hackathons, technical workshops, business case challenges, placement drives, and cultural fests hosted by IITs, NITs, AIIMS, BITS Pilani, and Chandigarh University.
-        </p>
-
-        <!-- Unstop Search Box with Cyber Auto-Suggest Dropdown -->
-        <div class="unstop-search-wrapper">
-          <div class="unstop-search-box">
-            <span class="search-box-icon">🔍</span>
-            <input type="text" id="hero-opportunity-search" placeholder="Type location (e.g. Mohali, Mumbai, Delhi) or university (e.g. CU, IIT, BITS)..." class="search-box-input" autocomplete="off" />
-            <button class="btn btn-primary search-box-btn">Search All India</button>
+      <div class="hero-dual-grid">
+        
+        <!-- Left Column: Text & Search Box -->
+        <div class="hero-left-col">
+          <div class="hero-badge-pill">
+            <span class="pulse-ring"></span>
+            <span class="badge-pill-text">🚀 HackathonHub • Find the Next Tech Event</span>
           </div>
 
-          <!-- Auto-Suggest Dropdown Results -->
-          <div class="auto-suggest-dropdown hidden" id="search-autocomplete">
-            <!-- Dynamic Suggestions Injected via JS -->
-          </div>
+          <h1 class="hero-title">
+            Find the Next Tech Event Across <span class="gradient-text-cyan">All India Universities</span>
+          </h1>
 
-          <!-- Quick Suggest Chips -->
-          <div class="quick-suggest-chips mt-3">
-            <span class="chip-label">Popular Searches:</span>
-            <button class="chip-item" onclick="document.getElementById('hero-opportunity-search').value='Mohali'; applyFilters();">📍 Mohali</button>
-            <button class="chip-item" onclick="document.getElementById('hero-opportunity-search').value='Chandigarh University'; applyFilters();">🏛️ Chandigarh University</button>
-            <button class="chip-item" onclick="document.getElementById('hero-opportunity-search').value='IIT Bombay'; applyFilters();">🏆 IIT Bombay</button>
-            <button class="chip-item" onclick="document.getElementById('hero-opportunity-search').value='AI'; applyFilters();">🤖 GenAI Bootcamps</button>
-          </div>
-        </div>
+          <p class="hero-subtitle">
+            Discover 100% FREE national hackathons, technical workshops, business case challenges, placement drives, and cultural fests hosted by IITs, NITs, AIIMS, BITS Pilani, and Chandigarh University.
+          </p>
 
-        <!-- Quick Ticker Stats Grid -->
-        <div class="hero-stats-row">
-          <div class="hero-stat-card">
-            <span class="hi-icon">🏆</span>
-            <div>
-              <strong class="hi-val">100% FREE</strong>
-              <span class="hi-lbl">Verified Campus Events</span>
+          <!-- Unstop Search Box with Cyber Auto-Suggest Dropdown -->
+          <div class="unstop-search-wrapper">
+            <div class="unstop-search-box">
+              <span class="search-box-icon">🔍</span>
+              <input type="text" id="hero-opportunity-search" placeholder="Type location or university..." class="search-box-input" autocomplete="off" />
+              <button class="btn btn-primary search-box-btn">Search All India</button>
+            </div>
+
+            <!-- Auto-Suggest Dropdown Results -->
+            <div class="auto-suggest-dropdown hidden" id="search-autocomplete">
+              <!-- Dynamic Suggestions Injected via JS -->
+            </div>
+
+            <!-- Quick Suggest Chips -->
+            <div class="quick-suggest-chips mt-3">
+              <span class="chip-label">Popular:</span>
+              <button class="chip-item" onclick="document.getElementById('hero-opportunity-search').value='Mohali'; applyFilters();">📍 Mohali</button>
+              <button class="chip-item" onclick="document.getElementById('hero-opportunity-search').value='Chandigarh University'; applyFilters();">🏛️ CU</button>
+              <button class="chip-item" onclick="document.getElementById('hero-opportunity-search').value='IIT Bombay'; applyFilters();">🏆 IIT Bombay</button>
+              <button class="chip-item" onclick="document.getElementById('hero-opportunity-search').value='AI'; applyFilters();">🤖 GenAI</button>
             </div>
           </div>
-          <div class="hero-stat-card">
-            <span class="hi-icon">⚡</span>
-            <div>
-              <strong class="hi-val">50,000+</strong>
-              <span class="hi-lbl">Registered Students</span>
+
+          <!-- Quick Ticker Stats Grid -->
+          <div class="hero-stats-row">
+            <div class="hero-stat-card">
+              <span class="hi-icon">🏆</span>
+              <div>
+                <strong class="hi-val">100% FREE</strong>
+                <span class="hi-lbl">Verified Events</span>
+              </div>
+            </div>
+            <div class="hero-stat-card">
+              <span class="hi-icon">⚡</span>
+              <div>
+                <strong class="hi-val">50,000+</strong>
+                <span class="hi-lbl">Registered Coders</span>
+              </div>
+            </div>
+            <div class="hero-stat-card">
+              <span class="hi-icon">💰</span>
+              <div>
+                <strong class="hi-val">₹10 Lakhs+</strong>
+                <span class="hi-lbl">Prize Pool</span>
+              </div>
             </div>
           </div>
-          <div class="hero-stat-card">
-            <span class="hi-icon">💰</span>
-            <div>
-              <strong class="hi-val">₹10 Lakhs+</strong>
-              <span class="hi-lbl">Prize Money Pool</span>
+        </div>
+
+        <!-- Right Column: Live Coders Image Showcase Card -->
+        <div class="hero-right-col">
+          <div class="live-coders-card">
+            <div class="live-card-badge">
+              <span class="live-dot"></span>
+              <span>LIVE HACKATHON CODING ROOM</span>
+            </div>
+
+            <div class="live-image-frame">
+              <img src="coding_hero_bg.jpg" alt="Live Developers Coding in Hackathon" class="live-coders-img" />
+              <div class="live-image-overlay"></div>
+            </div>
+
+            <div class="live-card-footer">
+              <div class="live-participants-avatars">
+                <span class="avatar-pill bg-cyan">AK</span>
+                <span class="avatar-pill bg-orange">RS</span>
+                <span class="avatar-pill bg-purple">VS</span>
+                <span class="avatar-more">+4.8k Live</span>
+              </div>
+              <div class="live-room-info">
+                <strong>24-Hour AI Sprint Active</strong>
+                <span class="live-sub">Mohali • IIT Bombay • Pan-India</span>
+              </div>
             </div>
           </div>
         </div>
@@ -203,7 +236,8 @@
     </div>
   </section>
 
-<section class="opportunities-section" id="opportunities">
+
+  <section class="opportunities-section" id="opportunities">
     <div class="container">
       <div class="section-header text-center">
         <span class="section-kicker">PAN-INDIA OPPORTUNITIES</span>
@@ -1015,10 +1049,9 @@
         </div>
 
         <div class="footer-col">
-          <h4 class="footer-heading">Official Support & Enquiries</h4>
-          <p class="contact-info">📍 Location: Sikar, Rajasthan, India</p>
-          <p class="contact-info">📞 Helpline / Mobile: +91 9351294898</p>
-          <p class="contact-info">✉️ Email Support: sanjayjatchoudhary0@gmail.com</p>
+          <h4 class="footer-heading">Campus Contact</h4>
+          <p class="contact-info">📍 Chandigarh University Campus, NH-05, Ludhiana - Chandigarh State Hwy, Mohali, Punjab 140413</p>
+          <p class="contact-info">📞 Helpline: +91 98765 43210 / +91 1800 121 288</p>
         </div>
       </div>
 
