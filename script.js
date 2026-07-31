@@ -190,7 +190,7 @@ async function initStorage() {
         date: '2026-07-30 11:15 AM',
         name: 'Amanpreet Kaur',
         email: 'amanpreet.cse@cuchd.in',
-        phone: '9876543210',
+        phone: '9351294898',
         course: 'CU HackNation 2026 [FREE]',
         college: 'Chandigarh University',
         message: 'Team Lead: Tech Titans. Members: Aman, Rahul, Priya, Vikas.',
