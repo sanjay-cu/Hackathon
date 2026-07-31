@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HackathonHub — Welcome Gateway | Select Portal</title>
-  <meta name="description" content="Welcome to HackathonHub. Discover. Participate. Grow. Your gateway to national hackathons, technical workshops, and coordinator admin management." />
+  <title>HackHub — Gateway Entrance | Discover Opportunities</title>
+  <meta name="description" content="Welcome to HackHub. Discover opportunities, participate in hackathons, and build your future. Access student opportunities and coordinator admin portal." />
   
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -14,10 +14,10 @@
   <!-- Custom Styles -->
   <link rel="stylesheet" href="style.css" />
   <style>
-    /* ULTRA-PREMIUM VIVID PORTAL GATEWAY STYLES */
+    /* ULTRA-PREMIUM VIVID LANDING GATEWAY STYLES */
     .portal-page-body {
       background: 
-        linear-gradient(180deg, rgba(7, 11, 25, 0.62) 0%, rgba(7, 11, 25, 0.82) 100%),
+        linear-gradient(180deg, rgba(7, 11, 25, 0.65) 0%, rgba(7, 11, 25, 0.88) 100%),
         url('portal_bg.jpg') no-repeat center center / cover;
       min-height: 100vh;
       color: #FFFFFF;
@@ -35,13 +35,13 @@
       padding: 1.5rem 3rem;
       position: relative;
       z-index: 10;
-      background: linear-gradient(180deg, rgba(7, 11, 25, 0.8) 0%, transparent 100%);
+      background: linear-gradient(180deg, rgba(7, 11, 25, 0.85) 0%, transparent 100%);
     }
 
     .portal-nav-links {
       display: flex;
       align-items: center;
-      gap: 2rem;
+      gap: 1.8rem;
       list-style: none;
     }
 
@@ -65,7 +65,7 @@
       max-width: 1050px;
       margin: 0 auto;
       text-align: center;
-      padding: 2rem 1.5rem;
+      padding: 2.5rem 1.5rem;
       position: relative;
       z-index: 5;
       flex: 1;
@@ -77,47 +77,48 @@
 
     .portal-main-title {
       font-family: var(--font-heading);
-      font-size: clamp(2.8rem, 5.5vw, 4.5rem);
+      font-size: clamp(3rem, 6vw, 4.8rem);
       font-weight: 900;
       letter-spacing: -0.03em;
       margin-bottom: 0.5rem;
-      text-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+      text-shadow: 0 10px 35px rgba(0, 0, 0, 0.9);
     }
 
     .portal-subtitle-tag {
-      font-size: 1.45rem;
+      font-size: 1.5rem;
       font-weight: 800;
       background: linear-gradient(135deg, #00E5FF 0%, #A855F7 50%, #FF9100 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       margin-bottom: 0.75rem;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.04em;
       filter: drop-shadow(0 4px 12px rgba(0, 229, 255, 0.4));
     }
 
     .portal-hero-desc {
-      color: #E2E8F0;
-      font-size: 1.1rem;
+      color: #F1F5F9;
+      font-size: 1.15rem;
       font-weight: 700;
-      margin-bottom: 3.25rem;
+      margin-bottom: 3.5rem;
       text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+      max-width: 780px;
     }
 
     /* DUAL GATEWAY CHOICE CARDS */
     .portal-cards-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 2.5rem;
+      gap: 2.75rem;
       width: 100%;
-      max-width: 860px;
-      margin: 0 auto 3rem auto;
+      max-width: 880px;
+      margin: 0 auto 3.5rem auto;
     }
 
     .gateway-card {
       background: rgba(15, 23, 42, 0.88);
       backdrop-filter: blur(28px);
       border-radius: 32px;
-      padding: 3.25rem 2.5rem;
+      padding: 3.5rem 2.5rem;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -127,7 +128,7 @@
       overflow: hidden;
     }
 
-    /* User Card Glow */
+    /* User Card Glow (Blue/Cyan Theme) */
     .gateway-card.user-card {
       border: 2px solid rgba(0, 229, 255, 0.45);
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 35px rgba(0, 229, 255, 0.25);
@@ -135,10 +136,10 @@
     .gateway-card.user-card:hover {
       transform: translateY(-12px) scale(1.03);
       border-color: #00E5FF;
-      box-shadow: 0 30px 80px rgba(0, 229, 255, 0.5), 0 0 50px rgba(0, 229, 255, 0.3);
+      box-shadow: 0 30px 80px rgba(0, 229, 255, 0.55), 0 0 50px rgba(0, 229, 255, 0.35);
     }
 
-    /* Admin Card Glow */
+    /* Admin Card Glow (Purple Theme) */
     .gateway-card.admin-card {
       border: 2px solid rgba(168, 85, 247, 0.45);
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 35px rgba(168, 85, 247, 0.25);
@@ -146,18 +147,18 @@
     .gateway-card.admin-card:hover {
       transform: translateY(-12px) scale(1.03);
       border-color: #A855F7;
-      box-shadow: 0 30px 80px rgba(168, 85, 247, 0.5), 0 0 50px rgba(168, 85, 247, 0.3);
+      box-shadow: 0 30px 80px rgba(168, 85, 247, 0.55), 0 0 50px rgba(168, 85, 247, 0.35);
     }
 
     .gateway-icon-circle {
-      width: 90px;
-      height: 90px;
+      width: 96px;
+      height: 96px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 2.5rem;
-      margin-bottom: 1.5rem;
+      font-size: 2.7rem;
+      margin-bottom: 1.65rem;
       position: relative;
     }
 
@@ -175,33 +176,33 @@
 
     .gateway-card-title {
       font-family: var(--font-heading);
-      font-size: 2.1rem;
-      font-weight: 800;
+      font-size: 2.25rem;
+      font-weight: 900;
       color: #FFFFFF;
-      margin-bottom: 0.65rem;
+      margin-bottom: 0.75rem;
       text-shadow: 0 4px 12px rgba(0,0,0,0.5);
     }
 
     .gateway-card-desc {
-      font-size: 0.95rem;
+      font-size: 1rem;
       color: #CBD5E1;
       line-height: 1.6;
-      margin-bottom: 2.25rem;
+      margin-bottom: 2.5rem;
       min-height: 52px;
       font-weight: 600;
     }
 
     .btn-gateway {
       width: 100%;
-      padding: 1rem 1.75rem;
+      padding: 1.1rem 1.85rem;
       border-radius: var(--radius-full);
       font-family: var(--font-heading);
       font-weight: 900;
-      font-size: 1.1rem;
+      font-size: 1.15rem;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 0.6rem;
+      gap: 0.65rem;
       transition: var(--transition-fast);
       text-decoration: none;
     }
@@ -234,7 +235,7 @@
       text-align: center;
       position: relative;
       z-index: 10;
-      background: linear-gradient(0deg, rgba(7, 11, 25, 0.9) 0%, transparent 100%);
+      background: linear-gradient(0deg, rgba(7, 11, 25, 0.95) 0%, transparent 100%);
     }
 
     .floating-features-pill {
@@ -244,7 +245,7 @@
       background: rgba(15, 23, 42, 0.85);
       backdrop-filter: blur(20px);
       border: 1.5px solid rgba(0, 229, 255, 0.3);
-      padding: 0.75rem 2.25rem;
+      padding: 0.8rem 2.5rem;
       border-radius: var(--radius-full);
       margin-bottom: 1.25rem;
       box-shadow: 0 12px 35px rgba(0, 0, 0, 0.5);
@@ -254,18 +255,18 @@
       display: flex;
       align-items: center;
       gap: 0.55rem;
-      font-size: 0.9rem;
+      font-size: 0.925rem;
       font-weight: 800;
       color: #F1F5F9;
     }
 
     .portal-quote {
-      font-size: 1.15rem;
+      font-size: 1.25rem;
       font-weight: 800;
       color: var(--brand-cyan);
       font-style: italic;
       letter-spacing: 0.04em;
-      text-shadow: 0 0 12px var(--brand-cyan-glow);
+      text-shadow: 0 0 14px var(--brand-cyan-glow);
     }
 
     @media (max-width: 768px) {
@@ -288,53 +289,53 @@
   <header class="portal-top-bar">
     <a href="index.html" class="logo-link">
       <div class="logo-glow-wrapper">
-        <img src="hackathon-hub-logo.png" alt="HackathonHub Logo" class="official-brand-logo-img" style="height: 52px;" />
+        <img src="hackathon-hub-logo.png" alt="HackHub Logo" class="official-brand-logo-img" style="height: 52px;" />
       </div>
       <div class="brand-text-block">
-        <span class="logo-brand-title" style="font-size: 1.6rem;"><span class="text-cyan">Hackathon</span><span class="text-orange">Hub</span></span>
+        <span class="logo-brand-title" style="font-size: 1.6rem;"><span class="text-cyan">Hack</span><span class="text-orange">Hub</span></span>
         <span class="logo-brand-sub" style="color: #CBD5E1; font-weight: 800;">Find the Next Tech Event</span>
       </div>
     </a>
 
     <ul class="portal-nav-links">
-      <li><a href="index.html#opportunities">📅 Hackathons</a></li>
-      <li><a href="index.html#opportunities">🛠️ Bootcamps</a></li>
-      <li><a href="index.html#calendar">⭐ Schedule</a></li>
-      <li><a href="index.html#partners">ℹ️ About Us</a></li>
+      <li><a href="user.html#opportunities">📅 Hackathons</a></li>
+      <li><a href="user.html#opportunities">🛠️ Workshops</a></li>
+      <li><a href="user.html#opportunities">💼 Internships</a></li>
+      <li><a href="user.html#opportunities">🎥 Webinars</a></li>
     </ul>
   </header>
 
-  <!-- Hero Dual Gateway Selector -->
+  <!-- Main Gateway Entrance Hero -->
   <main class="portal-hero-container">
-    <h1 class="portal-main-title">Welcome to <span class="text-cyan">Hackathon</span><span class="text-orange">Hub</span></h1>
-    <div class="portal-subtitle-tag">Discover. Participate. Grow.</div>
-    <p class="portal-hero-desc">🚀 Your gateway to national hackathons, technical workshops, and coordinator management!</p>
+    <h1 class="portal-main-title">Welcome to <span class="text-cyan">Hack</span><span class="text-orange">Hub</span></h1>
+    <div class="portal-subtitle-tag">Discover opportunities, participate in hackathons, and build your future.</div>
+    <p class="portal-hero-desc">🚀 Your gateway to national hackathons, technical workshops, internships, webinars, and innovation summits!</p>
 
-    <!-- Dual Choice Cards Grid -->
+    <!-- Two Large Centered Cards: User vs Admin -->
     <div class="portal-cards-grid">
       
-      <!-- Student / User Gateway Card -->
+      <!-- USER CARD -->
       <div class="gateway-card user-card">
         <div class="gateway-icon-circle">
           <span>👤</span>
         </div>
-        <h2 class="gateway-card-title">Student / User</h2>
+        <h2 class="gateway-card-title">User</h2>
         <p class="gateway-card-desc">
-          Explore free Pan-India hackathons, join AI/ML workshops, submit event entries, and verify certificates.
+          Explore hackathons, workshops, internships, and events.
         </p>
-        <a href="index.html" class="btn-gateway btn-gateway-user">
+        <a href="user.html" class="btn-gateway btn-gateway-user">
           <span>Continue as User &rarr;</span>
         </a>
       </div>
 
-      <!-- Coordinator Admin Gateway Card -->
+      <!-- ADMIN CARD -->
       <div class="gateway-card admin-card">
         <div class="gateway-icon-circle">
           <span>🛡️</span>
         </div>
-        <h2 class="gateway-card-title">Coordinator Admin</h2>
+        <h2 class="gateway-card-title">Admin</h2>
         <p class="gateway-card-desc">
-          Manage campus events, review student applications, push notifications, and monitor analytics.
+          Manage users, events, announcements, and content.
         </p>
         <a href="admin.html" class="btn-gateway btn-gateway-admin">
           <span>Continue as Admin &rarr;</span>
@@ -352,12 +353,12 @@
         <span>National Hackathons</span>
       </div>
       <div class="pill-feature-item">
-        <span>👥</span>
-        <span>Technical Bootcamps</span>
+        <span>🛠️</span>
+        <span>Technical Workshops</span>
       </div>
       <div class="pill-feature-item">
-        <span>⭐</span>
-        <span>Extra Opportunities</span>
+        <span>💼</span>
+        <span>Internships & Events</span>
       </div>
     </div>
 
