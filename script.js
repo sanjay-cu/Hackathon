@@ -1,114 +1,24 @@
 /* ==========================================================================
-   PAN-INDIA CAMPUS OPPORTUNITY HUB SCRIPT WITH MONGODB ATLAS & ADMIN PANEL
+   HACKATHONHUB - ULTRA-PREMIUM INTERACTIVE ENGINE & REAL-TIME SYNC
    ========================================================================== */
 
-document.addEventListener('DOMContentLoaded', async () => {
-  await initStorage();
-  initMobileDrawer();
-  initFormValidation();
-  initMultiFilters();
+document.addEventListener('DOMContentLoaded', () => {
+  initStorage();
   initAutoSuggestSearch();
+  initMultiFilters();
+  initNotificationCenter();
   initRegisterTriggers();
-  initTestimonialCarousel();
+  initMobileDrawer();
+  initStudentReviewCarousel();
   initCertificateVerification();
   initFaqAccordion();
-  initNotificationCenter();
+  initAdminAuth();
+  initLiveAnnouncementSync();
   renderDynamicEventsOnIndex();
-
-  if (document.querySelector('.admin-body')) {
-    initAdminAuth();
-  }
 });
 
-/* Global Window Modal Helpers */
-window.openAddEventModal = function() {
-  const modal = document.getElementById('add-event-modal');
-  if (modal) modal.classList.remove('hidden');
-};
-
-window.closeAddEventModal = function() {
-  const modal = document.getElementById('add-event-modal');
-  if (modal) modal.classList.add('hidden');
-};
-
-window.openAddManualLeadModal = function() {
-  const modal = document.getElementById('manual-lead-modal');
-  if (modal) modal.classList.remove('hidden');
-};
-
-window.closeAddManualLeadModal = function() {
-  const modal = document.getElementById('manual-lead-modal');
-  if (modal) modal.classList.add('hidden');
-};
-
-window.closeViewStudentModal = function() {
-  const modal = document.getElementById('view-student-modal');
-  if (modal) modal.classList.add('hidden');
-};
-
-window.logoutAdmin = function() {
-  sessionStorage.removeItem('admin_authenticated');
-  localStorage.removeItem('admin_authenticated');
-  location.reload();
-};
-
-window.viewStudentDetails = async function(id) {
-  const enquiries = await getEnquiries();
-  const student = enquiries.find(e => e.id === id);
-  if (!student) return;
-
-  const modal = document.getElementById('view-student-modal');
-  const vContent = document.getElementById('v-content');
-  const vAcceptBtn = document.getElementById('v-accept-btn');
-
-  if (vContent) {
-    vContent.innerHTML = `
-      <div style="background-color: #F8FAFC; padding: 1.25rem; border-radius: 12px; border: 1.5px solid #E2E8F0; display: flex; flex-direction: column; gap: 0.75rem;">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <span style="font-size: 0.75rem; font-weight: 800; color: #64748B; background: #E2E8F0; padding: 0.2rem 0.5rem; border-radius: 4px;">ID: ${student.id}</span>
-          <span style="font-size: 0.8rem; font-weight: 700; color: #64748B;">📅 Registered: ${student.date}</span>
-        </div>
-
-        <div style="border-bottom: 1px solid #E2E8F0; padding-bottom: 0.75rem;">
-          <h4 style="font-size: 1.25rem; font-weight: 800; color: #0F172A; margin-bottom: 0.2rem;">${escapeHtml(student.name)}</h4>
-          <p style="font-size: 0.875rem; color: #475569; font-weight: 600;">✉️ ${escapeHtml(student.email)}</p>
-          <p style="font-size: 0.875rem; color: #475569; font-weight: 600;">📞 Mobile: +91 ${escapeHtml(student.phone)}</p>
-        </div>
-
-        <div style="border-bottom: 1px solid #E2E8F0; padding-bottom: 0.75rem;">
-          <p style="font-size: 0.85rem; color: #64748B; font-weight: 700; text-transform: uppercase;">Applied Event Track:</p>
-          <p style="font-size: 1rem; font-weight: 800; color: #1E3A8A; margin-top: 0.1rem;">${escapeHtml(student.course)}</p>
-          <p style="font-size: 0.85rem; color: #475569; margin-top: 0.2rem;">🏛️ College: <strong>${escapeHtml(student.college)}</strong></p>
-        </div>
-
-        <div>
-          <p style="font-size: 0.85rem; color: #64748B; font-weight: 700; text-transform: uppercase;">Team Members / Project Notes / Github:</p>
-          <div style="background: #FFF; padding: 0.75rem; border-radius: 8px; border: 1px solid #E2E8F0; margin-top: 0.25rem; font-size: 0.875rem; color: #334155;">
-            ${escapeHtml(student.message || 'No additional notes provided.')}
-          </div>
-        </div>
-
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 0.5rem;">
-          <span style="font-size: 0.85rem; font-weight: 700; color: #475569;">Current Status:</span>
-          <span class="status-pill status-${student.status.toLowerCase()}">${student.status}</span>
-        </div>
-      </div>
-    `;
-  }
-
-  if (vAcceptBtn) {
-    vAcceptBtn.onclick = async function() {
-      await updateLeadStatus(student.id, 'Confirmed');
-      window.closeViewStudentModal();
-      alert(`🎉 Application for ${student.name} confirmed! Acceptance push notification dispatched.`);
-    };
-  }
-
-  if (modal) modal.classList.remove('hidden');
-};
-
 /* --------------------------------------------------------------------------
-   STRICT ADMIN AUTHENTICATION & PASSWORD PROTECTION
+   0. Admin Authentication & Session Management
    -------------------------------------------------------------------------- */
 function initAdminAuth() {
   const authScreen = document.getElementById('admin-auth-screen');
@@ -119,7 +29,6 @@ function initAdminAuth() {
   if (!authScreen || !mainLayout) return;
 
   const isAuth = sessionStorage.getItem('admin_authenticated') === 'true';
-
   if (isAuth) {
     authScreen.classList.add('hidden');
     mainLayout.classList.remove('hidden');
@@ -132,11 +41,10 @@ function initAdminAuth() {
   if (loginForm) {
     loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const email = (document.getElementById('admin_email').value || '').toLowerCase().trim();
-      const password = (document.getElementById('admin_password').value || '').trim();
+      const email = document.getElementById('admin_email').value.trim().toLowerCase();
+      const password = document.getElementById('admin_password').value.trim();
 
       let authenticated = false;
-
       try {
         const res = await fetch('/api/admin/login', {
           method: 'POST',
@@ -144,12 +52,9 @@ function initAdminAuth() {
           body: JSON.stringify({ email, password })
         });
         const data = await res.json();
-        if (res.ok && data.success) {
-          authenticated = true;
-        }
+        if (res.ok && data.success) authenticated = true;
       } catch (err) {}
 
-      // Resilient admin credential check
       const isEmailAdmin = email.includes('sanjay') || email.includes('admin') || email.includes('cu');
       const isPassOk = password.length >= 4;
 
@@ -167,6 +72,11 @@ function initAdminAuth() {
       }
     });
   }
+}
+
+function logoutAdmin() {
+  sessionStorage.removeItem('admin_authenticated');
+  window.location.href = 'admin.html';
 }
 
 /* --------------------------------------------------------------------------
@@ -314,7 +224,9 @@ async function saveEventItem(item) {
   return item;
 }
 
-/* Render dynamic events onto index.html grid */
+/* --------------------------------------------------------------------------
+   Render Dynamic Events onto Opportunity Cards Grid
+   -------------------------------------------------------------------------- */
 async function renderDynamicEventsOnIndex() {
   const grid = document.getElementById('opportunities-grid');
   if (!grid) return;
@@ -339,7 +251,7 @@ async function renderDynamicEventsOnIndex() {
     div.innerHTML = `
       <div class="opp-header-banner bg-gradient-blue">
         <div class="opp-status-pill ${isFree ? 'pill-free' : 'pill-paid'}">${isFree ? '🎁 100% FREE REGISTRATION' : '📜 CERTIFICATION WORKSHOP'}</div>
-        <div class="opp-category-badge">${escapeHtml(ev.organizer.toUpperCase())}</div>
+        <div class="opp-category-badge">${escapeHtml((ev.organizer || 'CU').toUpperCase())}</div>
         <div class="opp-banner-icon">🌟</div>
       </div>
       <div class="opp-body">
@@ -442,31 +354,23 @@ function initAutoSuggestSearch() {
       return;
     }
 
-    dropdown.innerHTML = `
-      <div class="suggest-category-header">Matched Locations & Universities</div>
-    `;
+    dropdown.innerHTML = `<div class="suggest-category-header">Matched Locations & Universities</div>`;
 
     matches.forEach(item => {
       const div = document.createElement('div');
       div.className = 'suggest-item';
-
-      let icon = '📍';
-      if (item.type === 'college') icon = '🏛️';
-      if (item.type === 'event') icon = '🏆';
-
+      const icon = item.type === 'location' ? '📍' : item.type === 'college' ? '🏛️' : '🏆';
       div.innerHTML = `
         <span class="suggest-icon">${icon}</span>
-        <div>
-          <span class="suggest-title">${escapeHtml(item.title)}</span>
-          <span class="suggest-subtitle">${escapeHtml(item.sub)}</span>
+        <div class="suggest-info">
+          <div class="suggest-title">${escapeHtml(item.title)}</div>
+          <div class="suggest-sub">${escapeHtml(item.sub)}</div>
         </div>
       `;
-
       div.addEventListener('click', () => {
-        searchInput.value = item.title;
+        searchInput.value = item.query;
         executeSearchAndScroll(item.query);
       });
-
       dropdown.appendChild(div);
     });
 
@@ -474,28 +378,18 @@ function initAutoSuggestSearch() {
   });
 
   if (searchBtn) {
-    searchBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      executeSearchAndScroll();
-    });
+    searchBtn.addEventListener('click', () => executeSearchAndScroll());
   }
 
-  searchInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      executeSearchAndScroll();
-    }
-  });
-
   document.addEventListener('click', (e) => {
-    if (dropdown && !searchInput.contains(e.target) && !dropdown.contains(e.target)) {
+    if (dropdown && !dropdown.contains(e.target) && e.target !== searchInput) {
       dropdown.classList.add('hidden');
     }
   });
 }
 
 /* --------------------------------------------------------------------------
-   2. MULTI-FILTER CONTROL ENGINE
+   2. MULTI-FILTER SHOWCASE ENGINE
    -------------------------------------------------------------------------- */
 let activeCategory = 'all';
 let activeFee = 'all';
@@ -557,9 +451,7 @@ function applyFilters() {
     let matchesSearch = true;
     if (terms.length > 0) {
       matchesSearch = terms.every(term => {
-        return cardText.includes(term) ||
-               cardLocation.includes(term) ||
-               cardCollege.includes(term);
+        return cardText.includes(term) || cardLocation.includes(term) || cardCollege.includes(term);
       });
     }
 
@@ -580,18 +472,15 @@ function applyFilters() {
     emptyStateMsg.innerHTML = `
       <div style="font-size: 3rem; margin-bottom: 0.5rem;">🔍</div>
       <h3 style="font-family: var(--font-heading); font-size: 1.4rem; color: var(--primary-navy); margin-bottom: 0.5rem;">No Opportunities Found</h3>
-      <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.25rem;">We couldn't find events matching your search filters. Try clearing your search query or selecting "All Categories".</p>
-      <button class="btn btn-secondary btn-sm" onclick="resetAllFilters()">Reset All Search Filters</button>
+      <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.25rem;">We couldn't find events matching your search filters.</p>
+      <button class="btn btn-secondary btn-sm" onclick="resetAllFilters()">Reset Search Filters</button>
     `;
     grid.appendChild(emptyStateMsg);
   }
 
   if (emptyStateMsg) {
-    if (visibleCount === 0) {
-      emptyStateMsg.classList.remove('hidden');
-    } else {
-      emptyStateMsg.classList.add('hidden');
-    }
+    if (visibleCount === 0) emptyStateMsg.classList.remove('hidden');
+    else emptyStateMsg.classList.add('hidden');
   }
 }
 
@@ -615,7 +504,7 @@ function resetAllFilters() {
 }
 
 /* --------------------------------------------------------------------------
-   3. STUDENT NOTIFICATION POPOVER DROPDOWN (OPENS DOWNSIDE BELL ICON)
+   3. STUDENT NOTIFICATION POPOVER DROPDOWN (INSTANT REAL-TIME SYNC)
    -------------------------------------------------------------------------- */
 function initNotificationCenter() {
   const bellBtn = document.getElementById('notif-bell-btn');
@@ -649,15 +538,30 @@ function initNotificationCenter() {
     }
   });
 
+  // INSTANT MARK ALL AS READ (0ms REAL-TIME SYNC)
   if (markReadBtn) {
-    markReadBtn.addEventListener('click', async () => {
+    markReadBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      
+      // 1. Instant DOM updates
+      if (badgeCountEl) {
+        badgeCountEl.textContent = '0';
+        badgeCountEl.style.display = 'none';
+      }
+      if (countTextEl) countTextEl.textContent = '0 Unread Notifications';
+      document.querySelectorAll('.notif-item').forEach(el => el.classList.remove('unread'));
+
+      // 2. Instant LocalStorage update
+      try {
+        const notifs = JSON.parse(localStorage.getItem('cu_notifications') || '[]');
+        notifs.forEach(n => n.read = true);
+        localStorage.setItem('cu_notifications', JSON.stringify(notifs));
+      } catch (err) {}
+
+      // 3. Background API Sync
       try {
         await fetch('/api/notifications/read', { method: 'PATCH' });
-      } catch (e) {}
-      const notifs = await getNotifications();
-      notifs.forEach(n => n.read = true);
-      localStorage.setItem('cu_notifications', JSON.stringify(notifs));
-      renderNotifications();
+      } catch (err) {}
     });
   }
 
@@ -665,21 +569,19 @@ function initNotificationCenter() {
     toastCloseBtn.addEventListener('click', () => toastEl.classList.add('hidden'));
   }
 
-  window.addEventListener('storage', async (e) => {
-    if (e.key === 'cu_notifications') {
-      await renderNotifications();
-      const notifs = await getNotifications();
-      if (notifs.length > 0 && !notifs[0].read) {
-        showToast(notifs[0].title, notifs[0].body);
-      }
-    }
+  window.addEventListener('storage', async () => {
+    await renderNotifications();
   });
 
   async function renderNotifications() {
     const notifs = await getNotifications();
     const unread = notifs.filter(n => !n.read).length;
 
-    if (badgeCountEl) badgeCountEl.textContent = unread;
+    if (badgeCountEl) {
+      badgeCountEl.textContent = unread;
+      if (unread === 0) badgeCountEl.style.display = 'none';
+      else badgeCountEl.style.display = 'flex';
+    }
     if (countTextEl) countTextEl.textContent = `${unread} Unread Notifications`;
 
     if (!notifListEl) return;
@@ -708,21 +610,40 @@ function initNotificationCenter() {
       notifListEl.appendChild(div);
     });
   }
+}
 
-  function showToast(title, body) {
-    if (!toastEl) return;
-    if (toastTitleEl) toastTitleEl.textContent = title;
-    if (toastBodyEl) toastBodyEl.textContent = body;
+function showToastNotification(title, body) {
+  const toastEl = document.getElementById('notif-toast');
+  const toastTitleEl = document.getElementById('toast-title');
+  const toastBodyEl = document.getElementById('toast-body');
 
-    toastEl.classList.remove('hidden');
-    setTimeout(() => {
-      toastEl.classList.add('hidden');
-    }, 6000);
+  if (!toastEl) return;
+  if (toastTitleEl) toastTitleEl.textContent = title;
+  if (toastBodyEl) toastBodyEl.textContent = body;
+
+  toastEl.classList.remove('hidden');
+  setTimeout(() => {
+    toastEl.classList.add('hidden');
+  }, 6000);
+}
+
+/* --------------------------------------------------------------------------
+   4. LIVE ANNOUNCEMENT SYNC ENGINE
+   -------------------------------------------------------------------------- */
+function initLiveAnnouncementSync() {
+  const savedMsg = localStorage.getItem('cu_announcement_text');
+  const savedBadge = localStorage.getItem('cu_announcement_badge');
+
+  if (savedMsg) {
+    document.querySelectorAll('.announcement-text').forEach(el => el.textContent = savedMsg);
+  }
+  if (savedBadge) {
+    document.querySelectorAll('.badge-new').forEach(el => el.textContent = savedBadge);
   }
 }
 
 /* --------------------------------------------------------------------------
-   4. Register Trigger Buttons
+   5. Register Trigger Buttons
    -------------------------------------------------------------------------- */
 function initRegisterTriggers() {
   const triggerBtns = document.querySelectorAll('.register-trigger-btn');
@@ -744,159 +665,61 @@ function initRegisterTriggers() {
 }
 
 /* --------------------------------------------------------------------------
-   5. Mobile Drawer Navigation
+   6. Mobile Drawer Navigation
    -------------------------------------------------------------------------- */
 function initMobileDrawer() {
   const toggleBtn = document.getElementById('menu-toggle-btn');
   const closeBtn = document.getElementById('menu-close-btn');
   const drawer = document.getElementById('mobile-drawer');
   const overlay = document.getElementById('mobile-overlay');
-  const drawerLinks = document.querySelectorAll('.drawer-link');
 
-  function openMenu() {
-    if (drawer && overlay) {
-      drawer.classList.add('active');
-      overlay.classList.add('active');
-      document.body.style.overflow = 'hidden';
-    }
+  if (!drawer || !overlay) return;
+
+  function openDrawer() {
+    drawer.classList.add('active');
+    overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
   }
 
-  function closeMenu() {
-    if (drawer && overlay) {
-      drawer.classList.remove('active');
-      overlay.classList.remove('active');
-      document.body.style.overflow = '';
-    }
+  function closeDrawer() {
+    drawer.classList.remove('active');
+    overlay.classList.remove('active');
+    document.body.style.overflow = '';
   }
 
-  if (toggleBtn) toggleBtn.addEventListener('click', openMenu);
-  if (closeBtn) closeBtn.addEventListener('click', closeMenu);
-  if (overlay) overlay.addEventListener('click', closeMenu);
+  if (toggleBtn) toggleBtn.addEventListener('click', openDrawer);
+  if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
+  if (overlay) overlay.addEventListener('click', closeDrawer);
 
-  drawerLinks.forEach(link => link.addEventListener('click', closeMenu));
-}
-
-/* --------------------------------------------------------------------------
-   6. Student Form Submission
-   -------------------------------------------------------------------------- */
-function initFormValidation() {
-  const form = document.getElementById('enquiry-form');
-  const submitBtn = document.getElementById('btn-submit-form');
-  const spinner = document.getElementById('form-spinner');
-  const successModal = document.getElementById('success-modal');
-  const successCloseBtn = document.getElementById('modal-success-close');
-  const successMsg = document.getElementById('success-modal-msg');
-
-  if (!form) return;
-
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const nameInput = document.getElementById('full_name');
-    const emailInput = document.getElementById('email');
-    const courseInput = document.getElementById('course');
-    const phoneInput = document.getElementById('phone');
-    const collegeInput = document.getElementById('college');
-    const messageInput = document.getElementById('message');
-
-    let isValid = true;
-
-    if (!nameInput.value.trim()) { showError('full_name'); isValid = false; } else { clearError('full_name'); }
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(emailInput.value.trim())) { showError('email'); isValid = false; } else { clearError('email'); }
-    if (!courseInput.value) { showError('course'); isValid = false; } else { clearError('course'); }
-    const phoneRegex = /^[0-9]{10}$/;
-    if (!phoneRegex.test(phoneInput.value.trim())) { showError('phone'); isValid = false; } else { clearError('phone'); }
-
-    if (!isValid) return;
-
-    submitBtn.disabled = true;
-    spinner.style.display = 'inline-block';
-
-    const studentName = nameInput.value.trim();
-    const studentEmail = emailInput.value.trim();
-    const selectedCourse = courseInput.value;
-    const studentPhone = phoneInput.value.trim();
-    const studentCollege = collegeInput.value.trim() || 'All India College';
-    const studentMsg = messageInput.value.trim() || 'No message provided';
-
-    const newLead = {
-      id: 'CU-LEAD-' + Math.floor(1000 + Math.random() * 9000),
-      date: new Date().toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' }),
-      name: studentName,
-      email: studentEmail,
-      phone: studentPhone,
-      course: selectedCourse,
-      college: studentCollege,
-      message: studentMsg,
-      status: 'Pending'
-    };
-
-    await saveEnquiryItem(newLead);
-
-    await saveNotificationItem({
-      id: 'NOTIF-' + Date.now(),
-      title: '📋 Registration Received',
-      body: `Your application for ${selectedCourse} has been submitted for review.`,
-      time: 'Just now',
-      read: false
-    });
-
-    submitBtn.disabled = false;
-    spinner.style.display = 'none';
-
-    successMsg.innerHTML = `Congratulations <strong>${escapeHtml(studentName)}</strong>! Your entry for <strong>${escapeHtml(selectedCourse)}</strong> has been registered. You will receive a notification 🔔 when your application is accepted!`;
-    
-    successModal.classList.remove('hidden');
-    form.reset();
+  document.querySelectorAll('.drawer-link').forEach(link => {
+    link.addEventListener('click', closeDrawer);
   });
-
-  if (successCloseBtn) {
-    successCloseBtn.addEventListener('click', () => successModal.classList.add('hidden'));
-  }
-
-  function showError(inputId) {
-    const field = document.getElementById(inputId);
-    if (field) {
-      const group = field.closest('.form-group');
-      if (group) group.classList.add('error');
-    }
-  }
-
-  function clearError(inputId) {
-    const field = document.getElementById(inputId);
-    if (field) {
-      const group = field.closest('.form-group');
-      if (group) group.classList.remove('error');
-    }
-  }
 }
 
 /* --------------------------------------------------------------------------
-   7. Testimonials Carousel
+   7. Student Review Testimonial Carousel
    -------------------------------------------------------------------------- */
-function initTestimonialCarousel() {
+function initStudentReviewCarousel() {
   const track = document.getElementById('testimonial-track');
-  const prevBtn = document.getElementById('t-prev');
-  const nextBtn = document.getElementById('t-next');
-  const dots = document.querySelectorAll('.carousel-dots .dot');
+  const prevBtn = document.getElementById('carousel-prev');
+  const nextBtn = document.getElementById('carousel-next');
+  const dots = document.querySelectorAll('.dot');
   const cards = document.querySelectorAll('.testimonial-card');
 
   if (!track || cards.length === 0) return;
 
   let currentIndex = 0;
-  const total = cards.length;
-  let autoplayTimer;
+  let autoplayTimer = null;
 
   function goToSlide(index) {
-    if (index < 0) index = total - 1;
-    if (index >= total) index = 0;
-
+    if (index < 0) index = cards.length - 1;
+    if (index >= cards.length) index = 0;
     currentIndex = index;
-    track.style.transform = `translateX(-${currentIndex * 100}%)`;
 
+    track.style.transform = `translateX(-${currentIndex * 100}%)`;
     dots.forEach((dot, idx) => {
-      dot.classList.toggle('active', idx === currentIndex);
+      if (idx === currentIndex) dot.classList.add('active');
+      else dot.classList.remove('active');
     });
   }
 
@@ -1004,7 +827,7 @@ function initFaqAccordion() {
 }
 
 /* --------------------------------------------------------------------------
-   10. ENTERPRISE ADMIN PANEL DASHBOARD ENGINE
+   10. ENTERPRISE ADMIN PANEL DASHBOARD ENGINE (INSTANT REAL-TIME PUSH SYNC)
    -------------------------------------------------------------------------- */
 function initAdminPanel() {
   initAdminSidebarTabs();
@@ -1056,33 +879,53 @@ function initAdminPanel() {
     });
   }
 
-  // Publish Event Form
+  // INSTANT PUBLISH NEW EVENT / INTERNSHIP FORM (REAL-TIME PUSH)
   const addEventForm = document.getElementById('add-event-form');
   if (addEventForm) {
     addEventForm.addEventListener('submit', async (e) => {
       e.preventDefault();
+      const title = document.getElementById('ev-title').value.trim();
+      const category = document.getElementById('ev-category').value;
+      const fee = document.getElementById('ev-fee').value;
+      const organizer = document.getElementById('ev-organizer').value.trim();
+      const prize = document.getElementById('ev-prize').value.trim();
+      const desc = document.getElementById('ev-desc').value.trim() || 'No description provided';
+
       const newEv = {
         id: 'EV-' + Math.floor(100 + Math.random() * 900),
-        title: document.getElementById('ev-title').value.trim(),
-        category: document.getElementById('ev-category').value,
-        fee: document.getElementById('ev-fee').value,
-        organizer: document.getElementById('ev-organizer').value.trim(),
-        prize: document.getElementById('ev-prize').value.trim(),
-        desc: document.getElementById('ev-desc').value.trim() || 'No description provided',
-        location: 'Chandigarh University / Pan-India',
+        title,
+        category,
+        fee,
+        organizer,
+        prize,
+        desc,
+        location: 'Pan-India / Online',
         inst: 'cu'
       };
 
+      // 1. Save to Database & LocalStorage
       await saveEventItem(newEv);
 
+      // 2. Dispatch push notification to all students
+      await saveNotificationItem({
+        id: 'NOTIF-' + Date.now(),
+        title: '🔥 New Opportunity Published!',
+        body: `${title} by ${organizer} is now live! Register before seats fill up.`,
+        time: 'Just now',
+        read: false
+      });
+
+      // 3. Instant UI re-renders across tabs
       window.closeAddEventModal();
       addEventForm.reset();
       await renderAdminEvents();
-      alert('🚀 Event successfully published to Campus Opportunities!');
+      await renderDynamicEventsOnIndex();
+      showToastNotification('🔥 New Opportunity Published!', title);
+      alert('🚀 Event / Internship successfully published live to Student Dashboard!');
     });
   }
 
-  // Push Notification Form Dispatcher
+  // INSTANT PUSH NOTIFICATION FORM DISPATCHER
   const pushForm = document.getElementById('push-notif-form');
   if (pushForm) {
     pushForm.addEventListener('submit', async (e) => {
@@ -1090,16 +933,18 @@ function initAdminPanel() {
       const title = document.getElementById('p-title').value.trim();
       const body = document.getElementById('p-body').value.trim();
 
-      await saveNotificationItem({
+      const notif = {
         id: 'NOTIF-' + Date.now(),
         title: title,
         body: body,
         time: 'Just now',
         read: false
-      });
+      };
 
+      await saveNotificationItem(notif);
       pushForm.reset();
-      alert('📢 Push notification dispatched to all students!');
+      showToastNotification(title, body);
+      alert('📢 Push notification dispatched live to all students!');
     });
   }
 }
@@ -1129,7 +974,6 @@ function initAdminSidebarTabs() {
 
 async function renderAdminDashboard() {
   const tbody = document.getElementById('enquiries-tbody');
-  const emptyState = document.getElementById('empty-state');
   if (!tbody) return;
 
   const enquiries = await getEnquiries();
@@ -1155,55 +999,111 @@ async function renderAdminDashboard() {
                           item.college.toLowerCase().includes(searchVal);
     const matchesCourse = courseVal === 'all' || item.course === courseVal;
     const matchesStatus = statusVal === 'all' || item.status === statusVal;
-
     return matchesSearch && matchesCourse && matchesStatus;
   });
 
   tbody.innerHTML = '';
 
-  if (filtered.length === 0) {
-    emptyState.classList.remove('hidden');
-    return;
-  } else {
-    emptyState.classList.add('hidden');
-  }
-
-  filtered.forEach(item => {
+  filtered.forEach(lead => {
     const tr = document.createElement('tr');
-
-    let statusClass = 'status-pending';
-    if (item.status === 'Contacted') statusClass = 'status-contacted';
-    if (item.status === 'Confirmed') statusClass = 'status-confirmed';
-    if (item.status === 'Cancelled') statusClass = 'status-cancelled';
-
     tr.innerHTML = `
-      <td><code>${item.id}</code></td>
-      <td style="white-space: nowrap;">${item.date}</td>
+      <td><strong style="color: var(--brand-cyan);">${escapeHtml(lead.id)}</strong></td>
+      <td>${escapeHtml(lead.date)}</td>
       <td>
-        <div class="student-meta-name">${escapeHtml(item.name)}</div>
-        <span class="student-meta-sub">✉️ ${escapeHtml(item.email)}</span>
-        <span class="student-meta-sub">📞 +91 ${escapeHtml(item.phone)}</span>
+        <div class="student-meta-name">${escapeHtml(lead.name)}</div>
+        <span class="student-meta-sub">${escapeHtml(lead.email)} • 📞 ${escapeHtml(lead.phone)}</span>
       </td>
-      <td><strong>${escapeHtml(item.course)}</strong></td>
-      <td>${escapeHtml(item.college)}</td>
+      <td><strong>${escapeHtml(lead.course)}</strong></td>
+      <td>${escapeHtml(lead.college)}</td>
       <td>
-        <span class="status-pill ${statusClass}">${item.status}</span>
+        <span class="status-pill status-${lead.status.toLowerCase()}">${escapeHtml(lead.status)}</span>
       </td>
       <td>
-        <div style="display: flex; gap: 0.5rem; align-items: center;">
-          <button class="btn btn-secondary btn-sm" style="padding: 0.3rem 0.6rem; font-size: 0.78rem;" onclick="window.viewStudentDetails('${item.id}')">👁️ View</button>
-          <select class="table-actions-dropdown" onchange="updateLeadStatus('${item.id}', this.value)">
-            <option value="Pending" ${item.status === 'Pending' ? 'selected' : ''}>Pending</option>
-            <option value="Contacted" ${item.status === 'Contacted' ? 'selected' : ''}>Contacted</option>
-            <option value="Confirmed" ${item.status === 'Confirmed' ? 'selected' : ''}>Confirmed (Accept)</option>
-            <option value="Cancelled" ${item.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
+        <div style="display: flex; gap: 0.4rem;">
+          <button class="btn btn-secondary btn-sm" onclick="viewStudentDetails('${lead.id}')">👁️ View</button>
+          <select class="table-actions-dropdown" onchange="updateLeadStatus('${lead.id}', this.value)">
+            <option value="Pending" ${lead.status === 'Pending' ? 'selected' : ''}>Pending</option>
+            <option value="Confirmed" ${lead.status === 'Confirmed' ? 'selected' : ''}>Confirmed</option>
+            <option value="Contacted" ${lead.status === 'Contacted' ? 'selected' : ''}>Contacted</option>
+            <option value="Cancelled" ${lead.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
           </select>
         </div>
       </td>
     `;
-
     tbody.appendChild(tr);
   });
+}
+
+async function updateLeadStatus(id, newStatus) {
+  try {
+    await fetch(`/api/enquiries/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: newStatus })
+    });
+  } catch (e) {}
+
+  const enquiries = await getEnquiries();
+  const lead = enquiries.find(e => e.id === id);
+  if (lead) {
+    lead.status = newStatus;
+    localStorage.setItem('cu_enquiries', JSON.stringify(enquiries));
+
+    if (newStatus === 'Confirmed') {
+      await saveNotificationItem({
+        id: 'NOTIF-' + Date.now(),
+        title: '🎉 Application Approved!',
+        body: `Congratulations ${lead.name}! Your application for ${lead.course} has been accepted.`,
+        time: 'Just now',
+        read: false
+      });
+      showToastNotification('🎉 Application Approved!', `Accepted ${lead.name} for ${lead.course}`);
+    }
+  }
+
+  await renderAdminDashboard();
+}
+
+async function viewStudentDetails(id) {
+  const enquiries = await getEnquiries();
+  const lead = enquiries.find(e => e.id === id);
+  if (!lead) return;
+
+  const modal = document.getElementById('view-student-modal');
+  const title = document.getElementById('v-title');
+  const content = document.getElementById('v-content');
+  const acceptBtn = document.getElementById('v-accept-btn');
+
+  if (title) title.textContent = `${lead.name}'s Application Details`;
+  if (content) {
+    content.innerHTML = `
+      <p style="margin-bottom: 0.5rem;"><strong>Application Lead ID:</strong> <span style="color: var(--brand-cyan); font-weight: 800;">${escapeHtml(lead.id)}</span></p>
+      <p style="margin-bottom: 0.5rem;"><strong>Student Full Name:</strong> ${escapeHtml(lead.name)}</p>
+      <p style="margin-bottom: 0.5rem;"><strong>Email Address:</strong> <a href="mailto:${escapeHtml(lead.email)}" style="color: var(--brand-cyan);">${escapeHtml(lead.email)}</a></p>
+      <p style="margin-bottom: 0.5rem;"><strong>Mobile Number:</strong> <a href="tel:${escapeHtml(lead.phone)}" style="color: var(--brand-cyan);">+91 ${escapeHtml(lead.phone)}</a></p>
+      <p style="margin-bottom: 0.5rem;"><strong>College / Institute:</strong> ${escapeHtml(lead.college)}</p>
+      <p style="margin-bottom: 0.5rem;"><strong>Applied Event / Course:</strong> <strong>${escapeHtml(lead.course)}</strong></p>
+      <p style="margin-bottom: 0.5rem;"><strong>Application Status:</strong> <span class="status-pill status-${lead.status.toLowerCase()}">${escapeHtml(lead.status)}</span></p>
+      <div style="background: #070B19; padding: 1rem; border-radius: 12px; margin-top: 0.75rem; border: 1px solid var(--border-cyber);">
+        <strong style="color: var(--brand-cyan); display: block; margin-bottom: 0.25rem;">Team Notes & Github Summary:</strong>
+        <p style="font-size: 0.875rem; color: #CBD5E1;">${escapeHtml(lead.message || 'No additional notes provided.')}</p>
+      </div>
+    `;
+  }
+
+  if (acceptBtn) {
+    acceptBtn.onclick = async () => {
+      await updateLeadStatus(id, 'Confirmed');
+      closeViewStudentModal();
+    };
+  }
+
+  if (modal) modal.classList.remove('hidden');
+}
+
+function closeViewStudentModal() {
+  const modal = document.getElementById('view-student-modal');
+  if (modal) modal.classList.add('hidden');
 }
 
 async function renderAdminEvents() {
@@ -1218,110 +1118,80 @@ async function renderAdminEvents() {
     div.className = 'event-card-admin';
     div.innerHTML = `
       <div>
-        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-          <span class="status-pill ${ev.fee === 'free' ? 'status-confirmed' : 'status-pending'}">${ev.fee.toUpperCase()}</span>
-          <code>${ev.id}</code>
-        </div>
         <h4>${escapeHtml(ev.title)}</h4>
-        <p style="font-size: 0.85rem; color: #64748B; margin-bottom: 0.5rem;">🏢 ${escapeHtml(ev.organizer)}</p>
-        <p style="font-size: 0.85rem; color: #1E293B;">🏆 ${escapeHtml(ev.prize)}</p>
+        <p style="font-size: 0.85rem; color: #64748B; margin-bottom: 0.5rem;"><strong>Organizer:</strong> ${escapeHtml(ev.organizer)}</p>
+        <p style="font-size: 0.85rem; color: #64748B; margin-bottom: 0.75rem;"><strong>Prize / Reward:</strong> ${escapeHtml(ev.prize)}</p>
       </div>
-      <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid #E2E8F0; display: flex; justify-content: space-between; align-items: center;">
-        <span style="font-size: 0.75rem; color: #94A3B8;">📍 ${escapeHtml(ev.location)}</span>
-        <button class="btn-text-link" style="color: #DC2626;" onclick="window.deleteEvent('${ev.id}')">Delete</button>
+      <div class="flex-between">
+        <span class="status-pill ${ev.fee === 'free' ? 'status-confirmed' : 'status-pending'}">${ev.fee === 'free' ? '100% FREE' : 'PAID'}</span>
+        <button class="btn btn-secondary btn-sm" onclick="deleteEventItem('${ev.id}')" style="color: #EF4444; border-color: #FCA5A5;">🗑️ Delete</button>
       </div>
     `;
     grid.appendChild(div);
   });
 }
 
-window.deleteEvent = async function(id) {
-  if (confirm('Are you sure you want to delete this campus event?')) {
-    try {
-      await fetch(`/api/events/${id}`, { method: 'DELETE' });
-    } catch (e) {}
-
-    let events = await getEvents();
-    events = events.filter(e => e.id !== id);
-    localStorage.setItem('cu_events', JSON.stringify(events));
-    await renderAdminEvents();
-  }
-};
-
-async function updateLeadStatus(id, newStatus) {
+async function deleteEventItem(id) {
   try {
-    await fetch(`/api/enquiries/${id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status: newStatus })
-    });
+    await fetch(`/api/events/${id}`, { method: 'DELETE' });
   } catch (e) {}
 
-  const enquiries = await getEnquiries();
-  const index = enquiries.findIndex(e => e.id === id);
-  if (index !== -1) {
-    const oldStatus = enquiries[index].status;
-    enquiries[index].status = newStatus;
-    localStorage.setItem('cu_enquiries', JSON.stringify(enquiries));
+  const events = await getEvents();
+  const filtered = events.filter(e => e.id !== id);
+  localStorage.setItem('cu_events', JSON.stringify(filtered));
 
-    if (newStatus === 'Confirmed' && oldStatus !== 'Confirmed') {
-      const studentName = enquiries[index].name;
-      const courseName = enquiries[index].course;
-      await saveNotificationItem({
-        id: 'NOTIF-' + Date.now(),
-        title: '🎉 Application Accepted!',
-        body: `Congratulations ${studentName}! Your application for ${courseName} has been ACCEPTED by the Coordinator.`,
-        time: 'Just now',
-        read: false
-      });
-    }
-
-    await renderAdminDashboard();
-  }
+  await renderAdminEvents();
+  alert('🗑️ Opportunity removed from catalog.');
 }
 
-async function exportEnquiriesToCSV() {
-  const enquiries = await getEnquiries();
-  if (enquiries.length === 0) {
-    alert('No enquiry data available to export.');
-    return;
-  }
+function openAddManualLeadModal() {
+  const modal = document.getElementById('manual-lead-modal');
+  if (modal) modal.classList.remove('hidden');
+}
 
-  let csvContent = 'data:text/csv;charset=utf-8,';
-  csvContent += 'ID,Date,Student Name,Email,Phone,Opportunity Track,College,Status,Notes\n';
+function closeAddManualLeadModal() {
+  const modal = document.getElementById('manual-lead-modal');
+  if (modal) modal.classList.add('hidden');
+}
 
-  enquiries.forEach(item => {
-    const row = [
-      `"${item.id}"`,
-      `"${item.date}"`,
-      `"${item.name}"`,
-      `"${item.email}"`,
-      `"${item.phone}"`,
-      `"${item.course}"`,
-      `"${item.college}"`,
-      `"${item.status}"`,
-      `"${item.message.replace(/"/g, '""')}"`
-    ].join(',');
-    csvContent += row + '\n';
+function openAddEventModal() {
+  const modal = document.getElementById('add-event-modal');
+  if (modal) modal.classList.remove('hidden');
+}
+
+function closeAddEventModal() {
+  const modal = document.getElementById('add-event-modal');
+  if (modal) modal.classList.add('hidden');
+}
+
+function exportEnquiriesToCSV() {
+  getEnquiries().then(enquiries => {
+    if (enquiries.length === 0) {
+      alert('No enquiries to export!');
+      return;
+    }
+
+    let csvContent = 'data:text/csv;charset=utf-8,ID,Date,Name,Email,Phone,Course,College,Status\n';
+    enquiries.forEach(e => {
+      csvContent += `"${e.id}","${e.date}","${e.name}","${e.email}","${e.phone}","${e.course}","${e.college}","${e.status}"\n`;
+    });
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `HackHub_Student_Applications_${Date.now()}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   });
-
-  const encodedUri = encodeURI(csvContent);
-  const link = document.createElement('a');
-  link.setAttribute('href', encodedUri);
-  link.setAttribute('download', `Pan_India_Opportunity_Registrations_${new Date().toISOString().slice(0,10)}.csv`);
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
 }
 
 function escapeHtml(str) {
-  return str.replace(/[&<>"']/g, (m) => {
-    return {
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      '"': '&quot;',
-      "'": '&#039;'
-    }[m];
-  });
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }
