@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HackathonHub Admin Console | Restricted Access</title>
+  <title>HackHub Admin Console | Restricted Access</title>
   
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -12,22 +12,144 @@
   
   <!-- Custom Styles -->
   <link rel="stylesheet" href="style.css" />
+  <style>
+    /* COMPACT HIGH-CONTRAST CENTERED LOGIN CARD STYLES */
+    .admin-auth-wrapper {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: 
+        linear-gradient(180deg, rgba(7, 11, 25, 0.9) 0%, rgba(7, 11, 25, 0.96) 100%),
+        url('portal_bg.jpg') no-repeat center center / cover;
+      padding: 1.5rem;
+    }
+
+    .auth-card {
+      background: #0F172A !important;
+      color: #FFFFFF !important;
+      border-radius: 24px !important;
+      padding: 2.75rem 2.25rem !important;
+      max-width: 440px !important;
+      width: 100% !important;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), 0 0 35px rgba(0, 229, 255, 0.35) !important;
+      border: 2px solid #00E5FF !important;
+      margin: 0 auto !important;
+      position: relative;
+      z-index: 10;
+    }
+
+    .auth-header {
+      text-align: center;
+      margin-bottom: 1.75rem;
+    }
+
+    .auth-title {
+      font-family: var(--font-heading);
+      font-size: 1.85rem !important;
+      font-weight: 800 !important;
+      color: #FFFFFF !important;
+      margin-top: 0.65rem;
+      margin-bottom: 0.45rem;
+      letter-spacing: -0.02em;
+    }
+
+    .auth-badge {
+      font-size: 0.725rem !important;
+      font-weight: 900 !important;
+      color: #FF9100 !important;
+      letter-spacing: 0.08em;
+      background: rgba(255, 145, 0, 0.15) !important;
+      padding: 0.35rem 0.85rem;
+      border-radius: 9999px;
+      display: inline-block;
+      border: 1px solid rgba(255, 145, 0, 0.35);
+    }
+
+    .auth-desc {
+      font-size: 0.925rem !important;
+      color: #CBD5E1 !important;
+      line-height: 1.5;
+      margin-top: 0.65rem;
+      font-weight: 600;
+    }
+
+    .auth-card .form-group {
+      margin-bottom: 1.25rem;
+      text-align: left;
+    }
+
+    .auth-card .form-label {
+      font-size: 0.9rem !important;
+      font-weight: 800 !important;
+      color: #FFFFFF !important;
+      margin-bottom: 0.45rem;
+      display: block;
+    }
+
+    .auth-card .input-with-icon {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .auth-card .form-input {
+      background-color: #070B19 !important;
+      color: #FFFFFF !important;
+      border: 1.5px solid rgba(0, 229, 255, 0.4) !important;
+      border-radius: 14px !important;
+      padding: 0.9rem 1rem 0.9rem 2.85rem !important;
+      font-size: 0.975rem !important;
+      font-weight: 600 !important;
+      width: 100% !important;
+    }
+
+    .auth-card .form-input::placeholder {
+      color: #94A3B8 !important;
+    }
+
+    .auth-card .form-input:focus {
+      outline: none !important;
+      border-color: #00E5FF !important;
+      box-shadow: 0 0 0 4px rgba(0, 229, 255, 0.25) !important;
+    }
+
+    .auth-card .input-icon {
+      position: absolute;
+      left: 1.1rem;
+      font-size: 1.15rem;
+      color: #00E5FF !important;
+      pointer-events: none;
+    }
+
+    .auth-error-alert {
+      background-color: rgba(239, 68, 68, 0.18) !important;
+      color: #FCA5A5 !important;
+      border: 1.5px solid #EF4444 !important;
+      padding: 0.85rem 1rem;
+      border-radius: 12px;
+      font-size: 0.875rem;
+      font-weight: 800;
+      text-align: center;
+      margin-bottom: 1.25rem;
+    }
+  </style>
 </head>
 <body class="admin-body">
 
-  <!-- ADMIN AUTHENTICATION LOGIN SCREEN (COMPACT, HIGH CONTRAST & CENTERED) -->
+  <!-- ADMIN AUTHENTICATION LOGIN SCREEN (HIGH CONTRAST & CENTERED COMPACT CARD) -->
   <div id="admin-auth-screen" class="admin-auth-wrapper">
     <div class="auth-card">
-      <div class="auth-header text-center">
-        <a href="index.html" class="logo-link" style="justify-content: center; margin-bottom: 1rem;">
-          <img src="hackathon-hub-logo.png" alt="HackathonHub" class="official-brand-logo-img" style="height: 60px;" />
+      <div class="auth-header">
+        <a href="index.html" class="logo-link" style="justify-content: center; margin-bottom: 0.75rem;">
+          <img src="hackathon-hub-logo.png" alt="HackHub" class="official-brand-logo-img" style="height: 60px;" />
         </a>
-        <h2 class="auth-title"><span class="text-cyan">Hackathon</span><span class="text-orange">Hub</span> Admin Console</h2>
+        <h2 class="auth-title"><span class="text-cyan">Hack</span><span class="text-orange">Hub</span> Admin Console</h2>
         <div class="auth-badge">🔒 RESTRICTED AUTHORIZED ACCESS ONLY</div>
-        <p class="auth-desc mt-2">Enter your verified coordinator credentials to unlock the management console.</p>
+        <p class="auth-desc">Enter your verified coordinator credentials to unlock the management console.</p>
       </div>
 
-      <form id="admin-login-form" class="enquiry-form mt-4">
+      <form id="admin-login-form" class="enquiry-form">
         <div id="auth-error-msg" class="auth-error-alert hidden">
           ❌ Invalid Admin Email or Password! Access Denied.
         </div>
@@ -36,7 +158,7 @@
           <label for="admin_email" class="form-label">Coordinator Email Address *</label>
           <div class="input-with-icon">
             <span class="input-icon">✉️</span>
-            <input type="email" id="admin_email" class="form-input" placeholder="admin@gmail.com" required />
+            <input type="email" id="admin_email" class="form-input" placeholder="admin@gmail.com" value="admin@gmail.com" required />
           </div>
         </div>
 
@@ -53,7 +175,7 @@
         </button>
 
         <div class="text-center mt-3">
-          <a href="user.html" class="btn-text-link" style="color: var(--brand-cyan);">&larr; Return to User Dashboard</a>
+          <a href="index.html" class="btn-text-link" style="color: #00E5FF; font-weight: 800;">&larr; Return to Gateway Entrance</a>
         </div>
       </form>
     </div>
@@ -62,13 +184,13 @@
   <!-- MAIN ADMIN DASHBOARD LAYOUT (HIDDEN UNTIL AUTHENTICATED) -->
   <div class="admin-layout hidden" id="admin-main-layout">
     
-    <!-- Sidebar Navigation -->
+    <!-- Sidebar Navigation with Expanded Management Options -->
     <aside class="admin-sidebar">
       <div class="sidebar-header">
         <a href="index.html" class="logo-link">
-          <img src="hackathon-hub-logo.png" alt="HackathonHub" class="official-brand-logo-img admin-logo-img" />
+          <img src="hackathon-hub-logo.png" alt="HackHub" class="official-brand-logo-img admin-logo-img" />
           <div class="brand-text-block">
-            <span class="logo-brand-title"><span class="text-cyan">Hackathon</span><span class="text-orange">Hub</span></span>
+            <span class="logo-brand-title"><span class="text-cyan">Hack</span><span class="text-orange">Hub</span></span>
             <span class="logo-brand-sub" style="color: #94A3B8;">Find the Next Tech Event</span>
           </div>
         </a>
@@ -82,14 +204,18 @@
         </button>
         <button class="sidebar-link" data-tab="tab-events">
           <span class="nav-icon">🏆</span>
-          <span>Manage Campus Events</span>
+          <span>Manage Events & Internships</span>
         </button>
-        <button class="sidebar-link" data-tab="tab-calendar">
-          <span class="nav-icon">📅</span>
-          <span>Upcoming Events Schedule</span>
+        <button class="sidebar-link" data-tab="tab-announcement-editor">
+          <span class="nav-icon">📢</span>
+          <span>Live Ticker Announcement</span>
+        </button>
+        <button class="sidebar-link" data-tab="tab-certificates">
+          <span class="nav-icon">🎓</span>
+          <span>Certificate Issue Manager</span>
         </button>
         <button class="sidebar-link" data-tab="tab-notifications">
-          <span class="nav-icon">📢</span>
+          <span class="nav-icon">🔔</span>
           <span>Push Notifications</span>
         </button>
       </nav>
@@ -98,8 +224,8 @@
         <button class="btn btn-outline btn-full btn-sm" onclick="logoutAdmin()" style="border-color: #EF4444; color: #F87171;">
           <span>🔒 Logout Console</span>
         </button>
-        <a href="index.html" class="btn btn-secondary btn-full btn-sm" style="text-align: center;">
-          <span>&larr; View Student Portal</span>
+        <a href="user.html" class="btn btn-secondary btn-full btn-sm" style="text-align: center;">
+          <span>&larr; View User Dashboard</span>
         </a>
       </div>
     </aside>
@@ -110,13 +236,13 @@
       <!-- Top Header Bar -->
       <header class="admin-topbar">
         <div class="topbar-welcome">
-          <h2>HackathonHub Coordinator Console</h2>
+          <h2>HackHub Coordinator Console</h2>
           <p class="text-muted">Logged in as: <strong style="color: var(--brand-cyan);">admin@gmail.com</strong></p>
         </div>
 
         <div class="topbar-actions">
           <button class="btn btn-secondary btn-sm" id="btn-export-csv" onclick="exportEnquiriesToCSV()">
-            <span>📥 Export to CSV</span>
+            <span>📥 Export Applications (CSV)</span>
           </button>
           <button class="btn btn-primary btn-sm" id="btn-add-manual" onclick="openAddManualLeadModal()">
             <span>+ Add Student Entry</span>
@@ -164,8 +290,8 @@
         <div class="admin-card">
           <div class="admin-card-header">
             <div>
-              <h3>Student Applications & Enquiries</h3>
-              <p class="text-muted">Review, accept applications, or update lead status in real time.</p>
+              <h3>Student Applications & Event Entries</h3>
+              <p class="text-muted">Review student applications, view team notes, accept applicants, or update lead status.</p>
             </div>
           </div>
 
@@ -173,7 +299,7 @@
           <div class="admin-filter-bar">
             <div class="search-input-wrap">
               <span class="search-icon">🔍</span>
-              <input type="text" id="admin-search" class="form-input" placeholder="Search by student name, email, phone, or college..." />
+              <input type="text" id="admin-search" class="form-input" placeholder="Search student name, email, phone, or college..." />
             </div>
 
             <div class="filter-dropdowns">
@@ -220,22 +346,22 @@
 
             <div id="empty-state" class="empty-state text-center hidden">
               <div class="empty-icon">📭</div>
-              <h4>No Enquiries Match Your Filters</h4>
-              <p class="text-muted">Try adjusting your search keywords or clearing filters.</p>
+              <h4>No Applications Match Filters</h4>
+              <p class="text-muted">Try adjusting search keywords or clearing filters.</p>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- TAB 2: MANAGE CAMPUS EVENTS (CRUD) -->
+      <!-- TAB 2: MANAGE CAMPUS EVENTS, WORKSHOPS & INTERNSHIPS (CRUD) -->
       <div class="admin-tab-content hidden" id="tab-events">
         <div class="admin-card">
           <div class="admin-card-header flex-between">
             <div>
-              <h3>HackathonHub Event Catalog</h3>
-              <p class="text-muted">Publish, edit, or remove hackathons, workshops, and placement challenges.</p>
+              <h3>HackHub Catalog Manager (Hackathons, Workshops & Internships)</h3>
+              <p class="text-muted">Publish, edit, or remove hackathons, technical bootcamps, internships, and webinars.</p>
             </div>
-            <button class="btn btn-primary btn-sm" id="btn-create-event" onclick="openAddEventModal()">+ Publish New Event</button>
+            <button class="btn btn-primary btn-sm" id="btn-create-event" onclick="openAddEventModal()">+ Publish New Opportunity</button>
           </div>
 
           <div class="events-grid-admin" id="events-grid-admin">
@@ -244,60 +370,78 @@
         </div>
       </div>
 
-      <!-- TAB 3: UPCOMING EVENTS SCHEDULE -->
-      <div class="admin-tab-content hidden" id="tab-calendar">
-        <div class="admin-card">
+      <!-- TAB 3: LIVE TICKER ANNOUNCEMENT EDITOR -->
+      <div class="admin-tab-content hidden" id="tab-announcement-editor">
+        <div class="admin-card max-w-600">
           <div class="admin-card-header">
-            <h3>Upcoming Tech Events & Summit Schedule (2026-27)</h3>
-            <p class="text-muted">Official timeline for national hackathons, VAC bootcamp weeks, and semester milestones.</p>
+            <h3>Live Announcement Ticker Bar Editor</h3>
+            <p class="text-muted">Update the top announcement ticker message displayed across the website in real time.</p>
           </div>
 
-          <div class="calendar-admin-list">
-            <div class="cal-admin-item">
-              <span class="cal-badge bg-gold">★ VAC WEEK</span>
-              <div>
-                <strong>05 OCT - 09 OCT 2026</strong>
-                <p>Value Added Courses (VAC) Week & Practical Edufabrica Bootcamps.</p>
-              </div>
+          <form id="announcement-editor-form" class="enquiry-form" onsubmit="event.preventDefault(); updateLiveAnnouncementBar();">
+            <div class="form-group">
+              <label for="announcement-text-input" class="form-label">Ticker Announcement Message *</label>
+              <input type="text" id="announcement-text-input" class="form-input" value="CU HackNation 2026 & IIT Bombay Techfest AI Registrations Open!" required />
             </div>
-            <div class="cal-admin-item">
-              <span class="cal-badge bg-blue">ORIENTATION</span>
-              <div>
-                <strong>23 JUL - 29 JUL 2026</strong>
-                <p>Orientation & Tech Induction (Batch 2026).</p>
-              </div>
+
+            <div class="form-group">
+              <label for="announcement-badge-input" class="form-label">Ticker Badge Tag</label>
+              <input type="text" id="announcement-badge-input" class="form-input" value="LIVE ANNOUNCEMENT" required />
             </div>
-            <div class="cal-admin-item">
-              <span class="cal-badge bg-teal">TEST-1</span>
-              <div>
-                <strong>24 AUG - 29 AUG 2026</strong>
-                <p>In Semester Test 1 (IST-1) evaluations.</p>
-              </div>
+
+            <button type="submit" class="btn btn-primary btn-full">Save Live Announcement Ticker 🚀</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- TAB 4: CERTIFICATE ISSUE MANAGER -->
+      <div class="admin-tab-content hidden" id="tab-certificates">
+        <div class="admin-card">
+          <div class="admin-card-header flex-between">
+            <div>
+              <h3>Official Certificate Issue Manager</h3>
+              <p class="text-muted">Generate official 10-character certificate IDs for students and manage verification records.</p>
             </div>
-            <div class="cal-admin-item">
-              <span class="cal-badge bg-purple">TEST-2</span>
-              <div>
-                <strong>12 OCT - 17 OCT 2026</strong>
-                <p>In Semester Test 2 (IST-2) evaluations.</p>
-              </div>
-            </div>
-            <div class="cal-admin-item">
-              <span class="cal-badge bg-red">EXAMS</span>
-              <div>
-                <strong>23 NOV - 19 DEC 2026</strong>
-                <p>End Semester Theory Examinations.</p>
-              </div>
-            </div>
+          </div>
+
+          <div class="table-responsive mt-3">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Certificate ID</th>
+                  <th>Student Name</th>
+                  <th>Course / Hackathon</th>
+                  <th>Issue Date</th>
+                  <th>Verification Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong style="color: var(--brand-cyan);">CU-2026-8942</strong></td>
+                  <td>Amanpreet Kaur</td>
+                  <td>CU HackNation 2026</td>
+                  <td>30 JUL 2026</td>
+                  <td><span class="status-pill status-confirmed">VERIFIED & ACTIVE</span></td>
+                </tr>
+                <tr>
+                  <td><strong style="color: var(--brand-cyan);">CU-2026-5511</strong></td>
+                  <td>Aditya</td>
+                  <td>Agentic AI Workshop</td>
+                  <td>28 JUL 2026</td>
+                  <td><span class="status-pill status-confirmed">VERIFIED & ACTIVE</span></td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
 
-      <!-- TAB 4: PUSH NOTIFICATIONS DISPATCHER -->
+      <!-- TAB 5: PUSH NOTIFICATIONS DISPATCHER -->
       <div class="admin-tab-content hidden" id="tab-notifications">
         <div class="admin-card max-w-600">
           <div class="admin-card-header">
             <h3>Push Notification Dispatcher</h3>
-            <p class="text-muted">Send live announcement notifications to students on the Student Portal.</p>
+            <p class="text-muted">Send live announcement notifications to students on the User Dashboard.</p>
           </div>
 
           <form id="push-notif-form" class="enquiry-form">
@@ -358,7 +502,7 @@
         <div class="form-row">
           <div class="form-group col-half">
             <label for="m-phone" class="form-label">Phone Number *</label>
-            <input type="tel" id="m-phone" class="form-input" placeholder="9876543210" required maxLength="10" />
+            <input type="tel" id="m-phone" class="form-input" placeholder="9351294898" required maxLength="10" />
           </div>
 
           <div class="form-group col-half">
@@ -400,11 +544,11 @@
     <div class="modal-card">
       <button class="modal-close" id="modal-event-close" onclick="closeAddEventModal()">&times;</button>
       <span class="modal-badge">EVENT MANAGER</span>
-      <h3 class="modal-title">Publish New Event / Opportunity</h3>
+      <h3 class="modal-title">Publish New Event / Internship</h3>
       
       <form id="add-event-form" class="enquiry-form mt-3">
         <div class="form-group">
-          <label for="ev-title" class="form-label">Event Title *</label>
+          <label for="ev-title" class="form-label">Opportunity Title *</label>
           <input type="text" id="ev-title" class="form-input" placeholder="e.g. National Quantum Computing Hackathon" required />
         </div>
 
@@ -414,9 +558,9 @@
             <select id="ev-category" class="form-select" required>
               <option value="hackathon">🏆 Hackathon & Coding</option>
               <option value="workshop">🛠️ Technical Workshop</option>
+              <option value="internship">💼 Internship & Hiring</option>
+              <option value="webinar">🎥 Live Webinar</option>
               <option value="case">💡 Case Competition</option>
-              <option value="hiring">💼 Hiring Drive</option>
-              <option value="cultural">🎨 Cultural Fest</option>
             </select>
           </div>
 
@@ -424,7 +568,7 @@
             <label for="ev-fee" class="form-label">Fee Type *</label>
             <select id="ev-fee" class="form-select" required>
               <option value="free">🎁 FREE Registration</option>
-              <option value="paid">📜 Paid Workshop</option>
+              <option value="paid">📜 Paid Option</option>
             </select>
           </div>
         </div>
@@ -432,12 +576,12 @@
         <div class="form-row">
           <div class="form-group col-half">
             <label for="ev-organizer" class="form-label">Organizer / College *</label>
-            <input type="text" id="ev-organizer" class="form-input" placeholder="e.g. Chandigarh University" required />
+            <input type="text" id="ev-organizer" class="form-input" placeholder="e.g. Chandigarh University / IIT" required />
           </div>
 
           <div class="form-group col-half">
-            <label for="ev-prize" class="form-label">Prize / Reward *</label>
-            <input type="text" id="ev-prize" class="form-input" placeholder="e.g. ₹2,00,000 Cash" required />
+            <label for="ev-prize" class="form-label">Prize / Stipend *</label>
+            <input type="text" id="ev-prize" class="form-input" placeholder="e.g. ₹2,00,000 Cash / ₹25k Stipend" required />
           </div>
         </div>
 
@@ -446,11 +590,18 @@
           <textarea id="ev-desc" class="form-textarea" placeholder="Enter brief summary..." rows="2"></textarea>
         </div>
 
-        <button type="submit" class="btn btn-primary btn-full mt-3">Publish to Student Portal</button>
+        <button type="submit" class="btn btn-primary btn-full mt-3">Publish to Student Dashboard</button>
       </form>
     </div>
   </div>
 
   <script src="script.js"></script>
+  <script>
+    function updateLiveAnnouncementBar() {
+      const msg = document.getElementById('announcement-text-input').value;
+      const badge = document.getElementById('announcement-badge-input').value;
+      alert('✅ Live Announcement Ticker Updated to:\n"' + badge + ': ' + msg + '"');
+    }
+  </script>
 </body>
 </html>
