@@ -658,9 +658,28 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; }
   .mobile-menu-toggle { display: block !important; }
 }
 
-@media (max-width: 900px) {
-  .admin-layout { flex-direction: column; }
-  .admin-sidebar { width: 100%; border-right: none; border-bottom: 1px solid #1E293B; }
-  .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
-  .registration-grid { grid-template-columns: 1fr; }
+
+/* TESTIMONIAL PASSPORT PHOTO STYLES */
+.t-avatar {
+  width: 64px !important;
+  height: 64px !important;
+  border-radius: 50% !important;
+  overflow: hidden !important;
+  border: 3px solid var(--brand-cyan) !important;
+  box-shadow: 0 6px 20px rgba(0, 229, 255, 0.45) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  background: linear-gradient(135deg, #00E5FF 0%, #2563EB 100%);
+  color: #FFFFFF;
+  font-weight: 900;
 }
+
+.t-avatar-img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center top !important;
+}
+
