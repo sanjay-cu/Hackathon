@@ -878,7 +878,7 @@ function initMobileDrawer() {
 }
 
 /* --------------------------------------------------------------------------
-   7. STUDENT REVIEW COMMENTS & ADMIN APPROVAL MODERATION ENGINE
+   7. STUDENT REVIEW COMMENTS & STRICT ADMIN APPROVAL MODERATION ENGINE
    -------------------------------------------------------------------------- */
 async function getReviews() {
   try {
@@ -924,7 +924,7 @@ function initStudentReviewCarousel() {
       const stars = '⭐'.repeat(ratingVal);
       const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2) || 'ST';
 
-      // SUBMIT WITH PENDING STATUS (REQUIRES ADMIN APPROVAL TO BE VISIBLE LIVE)
+      // SUBMIT WITH STRICT PENDING STATUS (WILL NOT DISPLAY ON STUDENT PANEL UNTIL ADMIN APPROVES)
       const newReview = {
         id: 'REV-' + Date.now(),
         name,
@@ -947,135 +947,133 @@ function initStudentReviewCarousel() {
         read: false
       });
 
-      showToastNotification('⌛ Review Submitted for Approval!', `Thank you ${name}! Your comment has been sent to the Admin queue for approval.`);
-      alert(`⌛ Thank you ${name}!\nYour experience review has been submitted to the Admin approval queue. It will be published live on the Student Panel as soon as the coordinator approves it!`);
+      showToastNotification('⌛ Review Sent to Admin Queue!', `Thank you ${name}! Your comment has been sent to the Admin queue for approval.`);
+      alert(`⌛ Thank you ${name}!\nYour experience comment has been submitted to the Admin approval queue.\n\nIt will NOT display on the Student Panel until the Coordinator approves it in the Admin Console.`);
     });
   }
+}
 
-  async function renderReviews() {
-    const customReviews = await getReviews();
-    // Only render reviews approved by admin (plus default verified student reviews)
-    const approvedReviews = customReviews.filter(r => r.status === 'Approved');
+async function renderReviews() {
+  const track = document.getElementById('testimonial-track');
+  const dotsContainer = document.getElementById('carousel-dots');
+  if (!track) return;
 
-    let html = `
-      <div class="testimonial-card active">
+  const deletedIds = JSON.parse(localStorage.getItem('cu_deleted_reviews') || '[]');
+  const customReviews = await getReviews();
+
+  const defaultReviews = [
+    {
+      id: 'REV-DEF-1',
+      name: 'Aditya',
+      detail: 'BE-CSE_AIML, Chandigarh University',
+      rating: '⭐⭐⭐⭐⭐',
+      comment: 'HackathonHub makes finding free national hackathons and Agentic AI bootcamps effortless. As an AI/ML student, I registered for top coding sprints across IITs and CU seamlessly!',
+      hasPhoto: true
+    },
+    {
+      id: 'REV-DEF-2',
+      name: 'Rohan Sharma',
+      detail: 'B.Tech AI & Data Science, CU',
+      rating: '⭐⭐⭐⭐⭐',
+      comment: 'The search bar auto-suggesting locations (Mohali, Mumbai, Delhi) and colleges makes finding tech events super fast!',
+      initials: 'RS'
+    }
+  ];
+
+  // STRICT FILTER: ONLY DISPLAY REVIEWS APPROVED BY ADMIN
+  const approvedCustom = customReviews.filter(r => r.status === 'Approved');
+  const allLive = [...defaultReviews, ...approvedCustom].filter(r => !deletedIds.includes(r.id));
+
+  let html = '';
+
+  allLive.forEach((r, idx) => {
+    const isActive = idx === 0 ? 'active' : '';
+    const avatarHtml = r.hasPhoto
+      ? `<img src="aditya.jpg" alt="Aditya Passport Photo" class="t-avatar-img" />`
+      : `<span style="font-size: 1.25rem; font-weight: 800;">${escapeHtml(r.initials || 'ST')}</span>`;
+
+    html += `
+      <div class="testimonial-card ${isActive}">
         <div class="t-quote-mark">&ldquo;</div>
-        <p class="t-comment">
-          "HackathonHub makes finding free national hackathons and Agentic AI bootcamps effortless. As an AI/ML student, I registered for top coding sprints across IITs and CU seamlessly!"
-        </p>
+        <p class="t-comment">"${escapeHtml(r.comment)}"</p>
         <div class="t-author">
-          <div class="t-avatar">
-            <img src="aditya.jpg" alt="Aditya Passport Photo" class="t-avatar-img" />
+          <div class="t-avatar" style="${!r.hasPhoto ? 'background: linear-gradient(135deg, #00E5FF 0%, #7C3AED 100%); color: #FFF;' : ''}">
+            ${avatarHtml}
           </div>
           <div class="t-info">
-            <h4 class="t-name">Aditya</h4>
-            <span class="t-detail">BE-CSE_AIML, Chandigarh University</span>
-            <div class="t-rating">⭐⭐⭐⭐⭐</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="testimonial-card">
-        <div class="t-quote-mark">&ldquo;</div>
-        <p class="t-comment">
-          "The search bar auto-suggesting locations (Mohali, Mumbai, Delhi) and colleges makes finding tech events super fast!"
-        </p>
-        <div class="t-author">
-          <div class="t-avatar">
-            <span style="font-size: 1.25rem; font-weight: 800;">RS</span>
-          </div>
-          <div class="t-info">
-            <h4 class="t-name">Rohan Sharma</h4>
-            <span class="t-detail">B.Tech AI & Data Science, CU</span>
-            <div class="t-rating">⭐⭐⭐⭐⭐</div>
+            <h4 class="t-name">${escapeHtml(r.name)}</h4>
+            <span class="t-detail">${escapeHtml(r.detail)}</span>
+            <div class="t-rating">${r.rating}</div>
           </div>
         </div>
       </div>
     `;
+  });
 
-    approvedReviews.forEach(r => {
-      html += `
-        <div class="testimonial-card">
-          <div class="t-quote-mark">&ldquo;</div>
-          <p class="t-comment">"${escapeHtml(r.comment)}"</p>
-          <div class="t-author">
-            <div class="t-avatar" style="background: linear-gradient(135deg, #00E5FF 0%, #7C3AED 100%); color: #FFF;">
-              <span style="font-size: 1.25rem; font-weight: 800;">${escapeHtml(r.initials)}</span>
-            </div>
-            <div class="t-info">
-              <h4 class="t-name">${escapeHtml(r.name)}</h4>
-              <span class="t-detail">${escapeHtml(r.detail)}</span>
-              <div class="t-rating">${r.rating}</div>
-            </div>
-          </div>
-        </div>
-      `;
+  track.innerHTML = html;
+
+  const cards = track.querySelectorAll('.testimonial-card');
+  if (dotsContainer) {
+    dotsContainer.innerHTML = '';
+    cards.forEach((c, idx) => {
+      const dot = document.createElement('span');
+      dot.className = `dot ${idx === 0 ? 'active' : ''}`;
+      dot.setAttribute('data-index', idx);
+      dotsContainer.appendChild(dot);
     });
-
-    track.innerHTML = html;
-
-    const cards = track.querySelectorAll('.testimonial-card');
-    if (dotsContainer) {
-      dotsContainer.innerHTML = '';
-      cards.forEach((c, idx) => {
-        const dot = document.createElement('span');
-        dot.className = `dot ${idx === 0 ? 'active' : ''}`;
-        dot.setAttribute('data-index', idx);
-        dotsContainer.appendChild(dot);
-      });
-    }
-
-    setupCarouselNavigation(cards);
   }
 
-  function setupCarouselNavigation(cards) {
-    const prevBtn = document.getElementById('t-prev');
-    const nextBtn = document.getElementById('t-next');
-    const dots = dotsContainer ? dotsContainer.querySelectorAll('.dot') : [];
+  setupCarouselNavigation(cards, track, dotsContainer);
+}
 
-    let currentIndex = 0;
-    let autoplayTimer = null;
+function setupCarouselNavigation(cards, track, dotsContainer) {
+  const prevBtn = document.getElementById('t-prev');
+  const nextBtn = document.getElementById('t-next');
+  const dots = dotsContainer ? dotsContainer.querySelectorAll('.dot') : [];
 
-    function goToSlide(index) {
-      if (index < 0) index = cards.length - 1;
-      if (index >= cards.length) index = 0;
-      currentIndex = index;
+  let currentIndex = 0;
+  let autoplayTimer = null;
 
-      cards.forEach((card, idx) => {
-        if (idx === currentIndex) card.classList.add('active');
-        else card.classList.remove('active');
-      });
+  function goToSlide(index) {
+    if (cards.length === 0) return;
+    if (index < 0) index = cards.length - 1;
+    if (index >= cards.length) index = 0;
+    currentIndex = index;
 
-      track.style.transform = `translateX(-${currentIndex * 100}%)`;
-      dots.forEach((dot, idx) => {
-        if (idx === currentIndex) dot.classList.add('active');
-        else dot.classList.remove('active');
-      });
-    }
-
-    if (prevBtn) prevBtn.onclick = () => { goToSlide(currentIndex - 1); resetAutoplay(); };
-    if (nextBtn) nextBtn.onclick = () => { goToSlide(currentIndex + 1); resetAutoplay(); };
-
-    dots.forEach(dot => {
-      dot.onclick = () => {
-        const idx = parseInt(dot.getAttribute('data-index'), 10);
-        goToSlide(idx);
-        resetAutoplay();
-      };
+    cards.forEach((card, idx) => {
+      if (idx === currentIndex) card.classList.add('active');
+      else card.classList.remove('active');
     });
 
-    function startAutoplay() {
-      clearInterval(autoplayTimer);
-      autoplayTimer = setInterval(() => { goToSlide(currentIndex + 1); }, 5000);
-    }
+    track.style.transform = `translateX(-${currentIndex * 100}%)`;
+    dots.forEach((dot, idx) => {
+      if (idx === currentIndex) dot.classList.add('active');
+      else dot.classList.remove('active');
+    });
+  }
 
-    function resetAutoplay() {
-      clearInterval(autoplayTimer);
-      startAutoplay();
-    }
+  if (prevBtn) prevBtn.onclick = () => { goToSlide(currentIndex - 1); resetAutoplay(); };
+  if (nextBtn) nextBtn.onclick = () => { goToSlide(currentIndex + 1); resetAutoplay(); };
 
+  dots.forEach(dot => {
+    dot.onclick = () => {
+      const idx = parseInt(dot.getAttribute('data-index'), 10);
+      goToSlide(idx);
+      resetAutoplay();
+    };
+  });
+
+  function startAutoplay() {
+    clearInterval(autoplayTimer);
+    autoplayTimer = setInterval(() => { goToSlide(currentIndex + 1); }, 5000);
+  }
+
+  function resetAutoplay() {
+    clearInterval(autoplayTimer);
     startAutoplay();
   }
+
+  startAutoplay();
 }
 
 /* --------------------------------------------------------------------------
@@ -1286,17 +1284,40 @@ async function renderAdminReviews() {
   const emptyState = document.getElementById('reviews-empty-state');
   if (!tbody) return;
 
-  const reviews = await getReviews();
+  const deletedIds = JSON.parse(localStorage.getItem('cu_deleted_reviews') || '[]');
+
+  const defaultReviews = [
+    {
+      id: 'REV-DEF-1',
+      name: 'Aditya',
+      detail: 'BE-CSE_AIML, Chandigarh University',
+      rating: '⭐⭐⭐⭐⭐',
+      comment: 'HackathonHub makes finding free national hackathons and Agentic AI bootcamps effortless. As an AI/ML student, I registered for top coding sprints across IITs and CU seamlessly!',
+      status: 'Approved'
+    },
+    {
+      id: 'REV-DEF-2',
+      name: 'Rohan Sharma',
+      detail: 'B.Tech AI & Data Science, CU',
+      rating: '⭐⭐⭐⭐⭐',
+      comment: 'The search bar auto-suggesting locations (Mohali, Mumbai, Delhi) and colleges makes finding tech events super fast!',
+      status: 'Approved'
+    }
+  ];
+
+  const customReviews = await getReviews();
+  const allReviews = [...defaultReviews, ...customReviews].filter(r => !deletedIds.includes(r.id));
+
   tbody.innerHTML = '';
 
-  if (reviews.length === 0) {
+  if (allReviews.length === 0) {
     if (emptyState) emptyState.classList.remove('hidden');
     return;
   } else {
     if (emptyState) emptyState.classList.add('hidden');
   }
 
-  reviews.forEach(r => {
+  allReviews.forEach(r => {
     const isApproved = r.status === 'Approved';
     const tr = document.createElement('tr');
     tr.innerHTML = `
@@ -1311,7 +1332,7 @@ async function renderAdminReviews() {
       <td>
         <div style="display: flex; gap: 0.4rem;">
           ${!isApproved ? `<button class="btn btn-primary btn-sm" onclick="approveStudentReview('${r.id}')">✓ Approve & Publish</button>` : ''}
-          <button class="btn btn-secondary btn-sm" onclick="deleteStudentReview('${r.id}')" style="color: #EF4444; border-color: #FCA5A5;">🗑️ Delete</button>
+          <button class="btn btn-secondary btn-sm" onclick="deleteStudentReview('${r.id}')" style="color: #EF4444; border-color: #FCA5A5;">🗑️ Delete Anytime</button>
         </div>
       </td>
     `;
@@ -1336,6 +1357,7 @@ async function approveStudentReview(id) {
   }
 
   await renderAdminReviews();
+  await renderReviews(); // Instantly update student portal live!
   alert('✅ Student review approved & published live on the Student Panel!');
 }
 
@@ -1348,8 +1370,15 @@ async function deleteStudentReview(id) {
   const filtered = reviews.filter(r => r.id !== id);
   localStorage.setItem('cu_reviews', JSON.stringify(filtered));
 
+  const deletedIds = JSON.parse(localStorage.getItem('cu_deleted_reviews') || '[]');
+  if (!deletedIds.includes(id)) {
+    deletedIds.push(id);
+    localStorage.setItem('cu_deleted_reviews', JSON.stringify(deletedIds));
+  }
+
   await renderAdminReviews();
-  alert('🗑️ Student review removed.');
+  await renderReviews(); // Instantly remove from student portal live!
+  alert('🗑️ Comment removed successfully! It will no longer display on the Student Panel.');
 }
 
 function initAdminSidebarTabs() {
