@@ -175,15 +175,20 @@ app.patch('/api/notifications/read', async (req, res) => {
   }
 });
 
+// Root Gateway Route
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'portal.html'));
+});
+
 // Fallback Route for Static HTML
 app.use((req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+  res.sendFile(path.join(__dirname, 'portal.html'));
 });
 
 // Start Express Server for Local Development
 if (require.main === module) {
   app.listen(PORT, () => {
-    console.log(`🚀 HackathonHub Server running live at http://localhost:${PORT}`);
+    console.log(`🚀 HackathonHub Gateway running live at http://localhost:${PORT}`);
   });
 }
 
