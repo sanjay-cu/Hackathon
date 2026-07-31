@@ -55,16 +55,16 @@ function initLiveClock() {
 }
 
 /* --------------------------------------------------------------------------
-   0. DYNAMIC EXPANDED OPPORTUNITY DROPDOWN ENGINE
+   0. DYNAMIC ALL-OPPORTUNITIES DROPDOWN ENGINE
    -------------------------------------------------------------------------- */
 const defaultOpportunityTracks = [
   'IIT Bombay Techfest AI Hackathon [FREE]',
   'CU HackNation 2026 National Coding Championship [FREE]',
+  'Agentic & Generative AI Workshop [PAID]',
   'IIT Delhi Tryst Coding Sprint [FREE]',
   'AIIMS MedTech Innovation Summit [FREE]',
   'BITS Pilani APOGEE Case Challenge [FREE]',
   'CU Super-30 Placement & Hiring Drive [FREE]',
-  'Agentic & Generative AI Bootcamp [PAID]',
   'Cybersecurity & Ethical Hacking Masterclass [PAID]',
   'Full-Stack Web3 & Blockchain Internship [PAID]',
   'AI/ML Career Guidance National Webinar [FREE]',
@@ -78,11 +78,33 @@ async function populateOpportunityDropdowns() {
   const adminManualSelect = document.getElementById('m-course');
   const adminFilterSelect = document.getElementById('filter-course');
 
-  const publishedEvents = await getEvents();
-  const customEventTitles = publishedEvents.map(e => `${e.title} [${e.fee.toUpperCase()}]`);
+  // 1. Scan all opportunity cards dynamically on user.html DOM
+  const domTitles = [];
+  document.querySelectorAll('.opp-card').forEach(card => {
+    const titleEl = card.querySelector('.opp-title');
+    const feeTag = card.querySelector('.opp-tag');
+    if (titleEl) {
+      const titleText = titleEl.textContent.trim();
+      const feeText = feeTag ? feeTag.textContent.trim().toUpperCase() : '';
+      const formattedOption = feeText ? `${titleText} [${feeText}]` : titleText;
+      domTitles.push(formattedOption);
+      domTitles.push(titleText);
+    }
+  });
 
-  // Merge default tracks + custom published events uniquely
-  const allTracks = Array.from(new Set([...defaultOpportunityTracks, ...customEventTitles]));
+  // 2. Fetch all published events from Database/LocalStorage
+  const publishedEvents = await getEvents();
+  const customEventTitles = publishedEvents.flatMap(e => [
+    `${e.title} [${(e.fee || 'free').toUpperCase()}]`,
+    e.title
+  ]);
+
+  // 3. Merge uniquely
+  const allTracks = Array.from(new Set([
+    ...domTitles,
+    ...customEventTitles,
+    ...defaultOpportunityTracks
+  ])).filter(Boolean);
 
   if (userSelect) {
     const selectedVal = userSelect.value;
@@ -394,6 +416,9 @@ async function renderDynamicEventsOnIndex() {
 
     grid.prepend(div);
   });
+
+  // Re-run dropdown populator so new cards are added instantly!
+  await populateOpportunityDropdowns();
 }
 
 /* --------------------------------------------------------------------------
@@ -744,25 +769,41 @@ function initLiveAnnouncementSync() {
 }
 
 /* --------------------------------------------------------------------------
-   5. Student Registration Form Submission with Live Date/Time Recording
+   5. Student Registration Form Submission with Live Event Selector
    -------------------------------------------------------------------------- */
 function initRegisterTriggers() {
-  const triggerBtns = document.querySelectorAll('.register-trigger-btn');
   const courseSelect = document.getElementById('course');
   const enquiryForm = document.getElementById('enquiry-form');
 
-  triggerBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
+  // Delegated click listener for ALL Register Now buttons on any opportunity card
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.register-trigger-btn');
+    if (btn && courseSelect) {
       const eventName = btn.getAttribute('data-event');
-      if (courseSelect && eventName) {
+      if (eventName) {
+        let matched = false;
+        const searchName = eventName.toLowerCase().trim();
+
         for (let i = 0; i < courseSelect.options.length; i++) {
-          if (courseSelect.options[i].text.includes(eventName) || courseSelect.options[i].value.includes(eventName)) {
+          const optText = courseSelect.options[i].text.toLowerCase();
+          const optVal = courseSelect.options[i].value.toLowerCase();
+          if (optText.includes(searchName) || optVal.includes(searchName)) {
             courseSelect.selectedIndex = i;
+            matched = true;
             break;
           }
         }
+
+        if (!matched) {
+          // Add exact event name to dropdown dynamically & select it
+          const newOpt = document.createElement('option');
+          newOpt.value = eventName;
+          newOpt.textContent = eventName;
+          courseSelect.appendChild(newOpt);
+          courseSelect.value = eventName;
+        }
       }
-    });
+    }
   });
 
   if (enquiryForm) {
