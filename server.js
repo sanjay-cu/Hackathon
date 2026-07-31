@@ -69,9 +69,14 @@ const Notification = mongoose.model('Notification', notificationSchema);
 
 // --- ADMIN AUTHENTICATION ---
 app.post('/api/admin/login', (req, res) => {
-  const { email, password } = req.body;
-  if (email === 'sanjayatchoudhary0@gmail.com' && password === 'Sanjay@935129') {
-    res.json({ success: true, token: 'ADMIN_SECURE_TOKEN_935129', user: 'sanjayatchoudhary0@gmail.com' });
+  const email = (req.body.email || '').toLowerCase().trim();
+  const password = (req.body.password || '').trim();
+
+  const isPrimary = (email === 'sanjayjatchoudhary0@gmail.com' && password === 'Sanjay@9351294898');
+  const isSecondary = (email === 'sanjayatchoudhary0@gmail.com' && (password === 'Sanjay@935129' || password === 'Sanjay@9351294898'));
+
+  if (isPrimary || isSecondary) {
+    res.json({ success: true, token: 'ADMIN_SECURE_TOKEN_9351294898', user: email });
   } else {
     res.status(401).json({ success: false, message: 'Invalid Admin Email or Password' });
   }

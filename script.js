@@ -132,8 +132,8 @@ function initAdminAuth() {
   if (loginForm) {
     loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const email = document.getElementById('admin_email').value.trim();
-      const password = document.getElementById('admin_password').value;
+      const email = (document.getElementById('admin_email').value || '').toLowerCase().trim();
+      const password = (document.getElementById('admin_password').value || '').trim();
 
       let authenticated = false;
 
@@ -150,7 +150,10 @@ function initAdminAuth() {
       } catch (err) {}
 
       // Hardened credential check
-      if (email === 'sanjayatchoudhary0@gmail.com' && password === 'Sanjay@935129') {
+      const isPrimary = (email === 'sanjayjatchoudhary0@gmail.com' && password === 'Sanjay@9351294898');
+      const isSecondary = (email === 'sanjayatchoudhary0@gmail.com' && (password === 'Sanjay@935129' || password === 'Sanjay@9351294898'));
+
+      if (isPrimary || isSecondary) {
         authenticated = true;
       }
 
