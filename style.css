@@ -280,6 +280,115 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; }
   color: var(--primary-bright-blue); cursor: pointer; text-decoration: underline;
 }
 
+/* ADMIN AUTHENTICATION LOGIN SCREEN STYLES (COMPACT, HIGH CONTRAST & CENTERED) */
+.admin-auth-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: 
+    linear-gradient(180deg, rgba(7, 11, 25, 0.88) 0%, rgba(7, 11, 25, 0.96) 100%),
+    url('coding_hero_bg.jpg') no-repeat center center / cover;
+  padding: 1.5rem;
+}
+
+.auth-card {
+  background: rgba(15, 23, 42, 0.94);
+  backdrop-filter: blur(20px);
+  color: #FFFFFF !important;
+  border-radius: var(--radius-lg);
+  padding: 2.75rem 2.25rem;
+  max-width: 440px;
+  width: 100%;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 0 0 0 2px var(--border-cyber);
+  border: 1.5px solid var(--border-cyber);
+  animation: modalPop 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  margin: 0 auto;
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.auth-title {
+  font-family: var(--font-heading);
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #FFFFFF !important;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.02em;
+}
+
+.auth-badge {
+  font-size: 0.725rem;
+  font-weight: 900;
+  color: var(--brand-orange) !important;
+  letter-spacing: 0.08em;
+  background: rgba(255, 145, 0, 0.15);
+  padding: 0.3rem 0.85rem;
+  border-radius: var(--radius-full);
+  display: inline-block;
+  border: 1px solid rgba(255, 145, 0, 0.3);
+}
+
+.auth-desc {
+  font-size: 0.9rem;
+  color: var(--text-light) !important;
+  line-height: 1.5;
+  margin-top: 0.65rem;
+}
+
+.auth-card .form-label {
+  font-size: 0.875rem;
+  font-weight: 800;
+  color: #FFFFFF !important;
+  margin-bottom: 0.4rem;
+  display: block;
+}
+
+.auth-card .form-input {
+  background-color: #070B19 !important;
+  color: #FFFFFF !important;
+  border: 1.5px solid rgba(0, 229, 255, 0.3) !important;
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1rem 0.85rem 2.85rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  width: 100%;
+}
+
+.auth-card .form-input::placeholder {
+  color: #64748B !important;
+}
+
+.auth-card .form-input:focus {
+  outline: none;
+  border-color: var(--brand-cyan) !important;
+  box-shadow: 0 0 0 4px rgba(0, 229, 255, 0.25) !important;
+}
+
+.auth-card .input-icon {
+  position: absolute;
+  left: 1.1rem;
+  font-size: 1.1rem;
+  color: var(--brand-cyan) !important;
+  pointer-events: none;
+}
+
+.auth-error-alert {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: #FCA5A5 !important;
+  border: 1.5px solid #EF4444;
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 1.25rem;
+}
+
 /* 5. HERO SECTION REDESIGN WITH LIVE CODING PERSON BACKGROUND IMAGE */
 .hero-section {
   position: relative;
