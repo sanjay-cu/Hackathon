@@ -4,6 +4,7 @@
 
 document.addEventListener('DOMContentLoaded', () => {
   initStorage();
+  initLiveClock();
   initAutoSuggestSearch();
   initMultiFilters();
   initNotificationCenter();
@@ -15,7 +16,110 @@ document.addEventListener('DOMContentLoaded', () => {
   initAdminAuth();
   initLiveAnnouncementSync();
   renderDynamicEventsOnIndex();
+  populateOpportunityDropdowns();
 });
+
+/* --------------------------------------------------------------------------
+   0. LIVE ACCURATE CLOCK & CALENDAR ENGINE (IST FORMAT)
+   -------------------------------------------------------------------------- */
+function getLiveDateTimeString() {
+  const now = new Date();
+  const day = String(now.getDate()).padStart(2, '0');
+  const monthNames = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+  const month = monthNames[now.getMonth()];
+  const year = now.getFullYear();
+  
+  let hours = now.getHours();
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const seconds = String(now.getSeconds()).padStart(2, '0');
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12;
+  hours = hours ? hours : 12;
+  const formattedHours = String(hours).padStart(2, '0');
+
+  return `📅 ${day} ${month} ${year} • ⏰ ${formattedHours}:${minutes}:${seconds} ${ampm} IST`;
+}
+
+function initLiveClock() {
+  const clockEl = document.getElementById('live-form-clock');
+  const adminClockEl = document.getElementById('admin-live-clock');
+
+  function updateClocks() {
+    const liveStr = getLiveDateTimeString();
+    if (clockEl) clockEl.textContent = liveStr;
+    if (adminClockEl) adminClockEl.textContent = liveStr;
+  }
+
+  updateClocks();
+  setInterval(updateClocks, 1000);
+}
+
+/* --------------------------------------------------------------------------
+   0. DYNAMIC EXPANDED OPPORTUNITY DROPDOWN ENGINE
+   -------------------------------------------------------------------------- */
+const defaultOpportunityTracks = [
+  'IIT Bombay Techfest AI Hackathon [FREE]',
+  'CU HackNation 2026 National Coding Championship [FREE]',
+  'IIT Delhi Tryst Coding Sprint [FREE]',
+  'AIIMS MedTech Innovation Summit [FREE]',
+  'BITS Pilani APOGEE Case Challenge [FREE]',
+  'CU Super-30 Placement & Hiring Drive [FREE]',
+  'Agentic & Generative AI Bootcamp [PAID]',
+  'Cybersecurity & Ethical Hacking Masterclass [PAID]',
+  'Full-Stack Web3 & Blockchain Internship [PAID]',
+  'AI/ML Career Guidance National Webinar [FREE]',
+  'UI/UX Design & Product Prototyping Challenge [FREE]',
+  'EV & Quantum Computing Research Bootcamp [PAID]',
+  'Other Custom Opportunity Track'
+];
+
+async function populateOpportunityDropdowns() {
+  const userSelect = document.getElementById('course');
+  const adminManualSelect = document.getElementById('m-course');
+  const adminFilterSelect = document.getElementById('filter-course');
+
+  const publishedEvents = await getEvents();
+  const customEventTitles = publishedEvents.map(e => `${e.title} [${e.fee.toUpperCase()}]`);
+
+  // Merge default tracks + custom published events uniquely
+  const allTracks = Array.from(new Set([...defaultOpportunityTracks, ...customEventTitles]));
+
+  if (userSelect) {
+    const selectedVal = userSelect.value;
+    userSelect.innerHTML = '<option value="" disabled selected>Select Opportunity Track / Event</option>';
+    allTracks.forEach(track => {
+      const opt = document.createElement('option');
+      opt.value = track;
+      opt.textContent = track;
+      userSelect.appendChild(opt);
+    });
+    if (selectedVal) userSelect.value = selectedVal;
+  }
+
+  if (adminManualSelect) {
+    const selectedVal = adminManualSelect.value;
+    adminManualSelect.innerHTML = '';
+    allTracks.forEach(track => {
+      const opt = document.createElement('option');
+      opt.value = track;
+      opt.textContent = track;
+      adminManualSelect.appendChild(opt);
+    });
+    if (selectedVal) adminManualSelect.value = selectedVal;
+  }
+
+  if (adminFilterSelect) {
+    const selectedVal = adminFilterSelect.value;
+    adminFilterSelect.innerHTML = '<option value="all">All Opportunity Tracks</option>';
+    allTracks.forEach(track => {
+      const opt = document.createElement('option');
+      opt.value = track;
+      opt.textContent = track;
+      adminFilterSelect.appendChild(opt);
+    });
+    if (selectedVal) adminFilterSelect.value = selectedVal;
+  }
+}
 
 /* --------------------------------------------------------------------------
    0. Admin Authentication & Session Management
@@ -97,7 +201,7 @@ async function initStorage() {
     const initialEnquiries = [
       {
         id: 'CU-LEAD-9012',
-        date: '2026-07-30 11:15 AM',
+        date: getLiveDateTimeString(),
         name: 'Amanpreet Kaur',
         email: 'amanpreet.cse@cuchd.in',
         phone: '9351294898',
@@ -108,7 +212,7 @@ async function initStorage() {
       },
       {
         id: 'CU-LEAD-9013',
-        date: '2026-07-30 10:45 AM',
+        date: getLiveDateTimeString(),
         name: 'Rohan Sharma',
         email: 'rohan.sharma@gmail.com',
         phone: '9812345678',
@@ -543,7 +647,6 @@ function initNotificationCenter() {
     markReadBtn.addEventListener('click', async (e) => {
       e.preventDefault();
       
-      // 1. Instant DOM updates
       if (badgeCountEl) {
         badgeCountEl.textContent = '0';
         badgeCountEl.style.display = 'none';
@@ -551,14 +654,12 @@ function initNotificationCenter() {
       if (countTextEl) countTextEl.textContent = '0 Unread Notifications';
       document.querySelectorAll('.notif-item').forEach(el => el.classList.remove('unread'));
 
-      // 2. Instant LocalStorage update
       try {
         const notifs = JSON.parse(localStorage.getItem('cu_notifications') || '[]');
         notifs.forEach(n => n.read = true);
         localStorage.setItem('cu_notifications', JSON.stringify(notifs));
       } catch (err) {}
 
-      // 3. Background API Sync
       try {
         await fetch('/api/notifications/read', { method: 'PATCH' });
       } catch (err) {}
@@ -643,11 +744,12 @@ function initLiveAnnouncementSync() {
 }
 
 /* --------------------------------------------------------------------------
-   5. Register Trigger Buttons
+   5. Student Registration Form Submission with Live Date/Time Recording
    -------------------------------------------------------------------------- */
 function initRegisterTriggers() {
   const triggerBtns = document.querySelectorAll('.register-trigger-btn');
   const courseSelect = document.getElementById('course');
+  const enquiryForm = document.getElementById('enquiry-form');
 
   triggerBtns.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -662,6 +764,45 @@ function initRegisterTriggers() {
       }
     });
   });
+
+  if (enquiryForm) {
+    enquiryForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const newApplication = {
+        id: 'CU-LEAD-' + Math.floor(1000 + Math.random() * 9000),
+        date: getLiveDateTimeString(),
+        name: document.getElementById('full_name').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        phone: document.getElementById('phone').value.trim(),
+        course: document.getElementById('course').value,
+        college: document.getElementById('college').value.trim() || 'All India College',
+        message: document.getElementById('message').value.trim() || 'No additional notes',
+        status: 'Pending'
+      };
+
+      await saveEnquiryItem(newApplication);
+
+      // Show success modal
+      const modal = document.getElementById('success-modal');
+      const modalMsg = document.getElementById('success-modal-msg');
+      if (modalMsg) {
+        modalMsg.innerHTML = `
+          Thank you <strong>${escapeHtml(newApplication.name)}</strong>! Your application for <strong>${escapeHtml(newApplication.course)}</strong> has been registered on <span style="color: var(--brand-cyan); font-weight: 800;">${newApplication.date}</span>.
+        `;
+      }
+      if (modal) modal.classList.remove('hidden');
+
+      enquiryForm.reset();
+    });
+
+    const modalCloseBtn = document.getElementById('modal-success-close');
+    if (modalCloseBtn) {
+      modalCloseBtn.addEventListener('click', () => {
+        document.getElementById('success-modal')?.classList.add('hidden');
+      });
+    }
+  }
 }
 
 /* --------------------------------------------------------------------------
@@ -827,12 +968,13 @@ function initFaqAccordion() {
 }
 
 /* --------------------------------------------------------------------------
-   10. ENTERPRISE ADMIN PANEL DASHBOARD ENGINE (INSTANT REAL-TIME PUSH SYNC)
+   10. ENTERPRISE ADMIN PANEL DASHBOARD ENGINE
    -------------------------------------------------------------------------- */
 function initAdminPanel() {
   initAdminSidebarTabs();
   renderAdminDashboard();
   renderAdminEvents();
+  populateOpportunityDropdowns();
 
   const searchInput = document.getElementById('admin-search');
   const courseFilter = document.getElementById('filter-course');
@@ -851,7 +993,7 @@ function initAdminPanel() {
       e.preventDefault();
       const newLead = {
         id: 'CU-LEAD-' + Math.floor(1000 + Math.random() * 9000),
-        date: new Date().toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' }),
+        date: getLiveDateTimeString(),
         name: document.getElementById('m-name').value.trim(),
         email: document.getElementById('m-email').value.trim(),
         phone: document.getElementById('m-phone').value.trim(),
@@ -879,7 +1021,7 @@ function initAdminPanel() {
     });
   }
 
-  // INSTANT PUBLISH NEW EVENT / INTERNSHIP FORM (REAL-TIME PUSH)
+  // INSTANT PUBLISH NEW EVENT / INTERNSHIP FORM
   const addEventForm = document.getElementById('add-event-form');
   if (addEventForm) {
     addEventForm.addEventListener('submit', async (e) => {
@@ -903,10 +1045,9 @@ function initAdminPanel() {
         inst: 'cu'
       };
 
-      // 1. Save to Database & LocalStorage
       await saveEventItem(newEv);
+      await populateOpportunityDropdowns();
 
-      // 2. Dispatch push notification to all students
       await saveNotificationItem({
         id: 'NOTIF-' + Date.now(),
         title: '🔥 New Opportunity Published!',
@@ -915,13 +1056,12 @@ function initAdminPanel() {
         read: false
       });
 
-      // 3. Instant UI re-renders across tabs
       window.closeAddEventModal();
       addEventForm.reset();
       await renderAdminEvents();
       await renderDynamicEventsOnIndex();
       showToastNotification('🔥 New Opportunity Published!', title);
-      alert('🚀 Event / Internship successfully published live to Student Dashboard!');
+      alert('🚀 Event / Internship successfully published & added to Opportunity dropdown!');
     });
   }
 
@@ -1008,7 +1148,7 @@ async function renderAdminDashboard() {
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td><strong style="color: var(--brand-cyan);">${escapeHtml(lead.id)}</strong></td>
-      <td>${escapeHtml(lead.date)}</td>
+      <td><span style="font-size: 0.825rem; font-weight: 700; color: var(--primary-navy);">${escapeHtml(lead.date)}</span></td>
       <td>
         <div class="student-meta-name">${escapeHtml(lead.name)}</div>
         <span class="student-meta-sub">${escapeHtml(lead.email)} • 📞 ${escapeHtml(lead.phone)}</span>
@@ -1078,6 +1218,7 @@ async function viewStudentDetails(id) {
   if (content) {
     content.innerHTML = `
       <p style="margin-bottom: 0.5rem;"><strong>Application Lead ID:</strong> <span style="color: var(--brand-cyan); font-weight: 800;">${escapeHtml(lead.id)}</span></p>
+      <p style="margin-bottom: 0.5rem;"><strong>Registration Date & Time:</strong> <span style="color: #059669; font-weight: 800;">${escapeHtml(lead.date)}</span></p>
       <p style="margin-bottom: 0.5rem;"><strong>Student Full Name:</strong> ${escapeHtml(lead.name)}</p>
       <p style="margin-bottom: 0.5rem;"><strong>Email Address:</strong> <a href="mailto:${escapeHtml(lead.email)}" style="color: var(--brand-cyan);">${escapeHtml(lead.email)}</a></p>
       <p style="margin-bottom: 0.5rem;"><strong>Mobile Number:</strong> <a href="tel:${escapeHtml(lead.phone)}" style="color: var(--brand-cyan);">+91 ${escapeHtml(lead.phone)}</a></p>
@@ -1141,6 +1282,7 @@ async function deleteEventItem(id) {
   localStorage.setItem('cu_events', JSON.stringify(filtered));
 
   await renderAdminEvents();
+  await populateOpportunityDropdowns();
   alert('🗑️ Opportunity removed from catalog.');
 }
 
