@@ -130,6 +130,7 @@
   </aside>
 
   <!-- Hero Section with 2-Column Grid & Live Coders Showcase Graphic -->
+    <!-- Hero Section with Live Coding Person Background Image -->
   <section class="hero-section" id="hero">
     <div class="hero-bg-grid"></div>
     <div class="hero-light-orbs">
@@ -137,97 +138,66 @@
       <div class="orb orb-2"></div>
     </div>
 
-    <div class="container hero-container">
-      <div class="hero-dual-grid">
+    <div class="container">
+      <div class="hero-content text-center">
         
-        <!-- Left Column: Text & Search Box -->
-        <div class="hero-left-col">
-          <div class="hero-badge-pill">
-            <span class="pulse-ring"></span>
-            <span class="badge-pill-text">🚀 HackathonHub • Find the Next Tech Event</span>
+        <div class="hero-badge-pill">
+          <span class="pulse-ring"></span>
+          <span class="badge-pill-text">🚀 HackathonHub • Find the Next Tech Event</span>
+        </div>
+
+        <h1 class="hero-title">
+          Find the Next Tech Event Across <span class="gradient-text-cyan">All India Universities</span>
+        </h1>
+
+        <p class="hero-subtitle">
+          Discover 100% FREE national hackathons, technical workshops, business case challenges, placement drives, and cultural fests hosted by IITs, NITs, AIIMS, BITS Pilani, and Chandigarh University.
+        </p>
+
+        <!-- Unstop Search Box with Cyber Auto-Suggest Dropdown -->
+        <div class="unstop-search-wrapper">
+          <div class="unstop-search-box">
+            <span class="search-box-icon">🔍</span>
+            <input type="text" id="hero-opportunity-search" placeholder="Type location or university (e.g. Mohali, IIT Bombay, GenAI)..." class="search-box-input" autocomplete="off" />
+            <button class="btn btn-primary search-box-btn">Search All India</button>
           </div>
 
-          <h1 class="hero-title">
-            Find the Next Tech Event Across <span class="gradient-text-cyan">All India Universities</span>
-          </h1>
-
-          <p class="hero-subtitle">
-            Discover 100% FREE national hackathons, technical workshops, business case challenges, placement drives, and cultural fests hosted by IITs, NITs, AIIMS, BITS Pilani, and Chandigarh University.
-          </p>
-
-          <!-- Unstop Search Box with Cyber Auto-Suggest Dropdown -->
-          <div class="unstop-search-wrapper">
-            <div class="unstop-search-box">
-              <span class="search-box-icon">🔍</span>
-              <input type="text" id="hero-opportunity-search" placeholder="Type location or university..." class="search-box-input" autocomplete="off" />
-              <button class="btn btn-primary search-box-btn">Search All India</button>
-            </div>
-
-            <!-- Auto-Suggest Dropdown Results -->
-            <div class="auto-suggest-dropdown hidden" id="search-autocomplete">
-              <!-- Dynamic Suggestions Injected via JS -->
-            </div>
-
-            <!-- Quick Suggest Chips -->
-            <div class="quick-suggest-chips mt-3">
-              <span class="chip-label">Popular:</span>
-              <button class="chip-item" onclick="document.getElementById('hero-opportunity-search').value='Mohali'; applyFilters();">📍 Mohali</button>
-              <button class="chip-item" onclick="document.getElementById('hero-opportunity-search').value='Chandigarh University'; applyFilters();">🏛️ CU</button>
-              <button class="chip-item" onclick="document.getElementById('hero-opportunity-search').value='IIT Bombay'; applyFilters();">🏆 IIT Bombay</button>
-              <button class="chip-item" onclick="document.getElementById('hero-opportunity-search').value='AI'; applyFilters();">🤖 GenAI</button>
-            </div>
+          <!-- Auto-Suggest Dropdown Results -->
+          <div class="auto-suggest-dropdown hidden" id="search-autocomplete">
+            <!-- Dynamic Suggestions Injected via JS -->
           </div>
 
-          <!-- Quick Ticker Stats Grid -->
-          <div class="hero-stats-row">
-            <div class="hero-stat-card">
-              <span class="hi-icon">🏆</span>
-              <div>
-                <strong class="hi-val">100% FREE</strong>
-                <span class="hi-lbl">Verified Events</span>
-              </div>
-            </div>
-            <div class="hero-stat-card">
-              <span class="hi-icon">⚡</span>
-              <div>
-                <strong class="hi-val">50,000+</strong>
-                <span class="hi-lbl">Registered Coders</span>
-              </div>
-            </div>
-            <div class="hero-stat-card">
-              <span class="hi-icon">💰</span>
-              <div>
-                <strong class="hi-val">₹10 Lakhs+</strong>
-                <span class="hi-lbl">Prize Pool</span>
-              </div>
-            </div>
+          <!-- Quick Suggest Chips -->
+          <div class="quick-suggest-chips mt-3">
+            <span class="chip-label">Popular Searches:</span>
+            <button class="chip-item" onclick="document.getElementById('hero-opportunity-search').value='Mohali'; applyFilters();">📍 Mohali</button>
+            <button class="chip-item" onclick="document.getElementById('hero-opportunity-search').value='Chandigarh University'; applyFilters();">🏛️ CU</button>
+            <button class="chip-item" onclick="document.getElementById('hero-opportunity-search').value='IIT Bombay'; applyFilters();">🏆 IIT Bombay</button>
+            <button class="chip-item" onclick="document.getElementById('hero-opportunity-search').value='AI'; applyFilters();">🤖 GenAI</button>
           </div>
         </div>
 
-        <!-- Right Column: Live Coders Image Showcase Card -->
-        <div class="hero-right-col">
-          <div class="live-coders-card">
-            <div class="live-card-badge">
-              <span class="live-dot"></span>
-              <span>LIVE HACKATHON CODING ROOM</span>
+        <!-- Quick Ticker Stats Grid -->
+        <div class="hero-stats-row">
+          <div class="hero-stat-card">
+            <span class="hi-icon">🏆</span>
+            <div>
+              <strong class="hi-val">100% FREE</strong>
+              <span class="hi-lbl">Verified Opportunities</span>
             </div>
-
-            <div class="live-image-frame">
-              <img src="coding_hero_bg.jpg" alt="Live Developers Coding in Hackathon" class="live-coders-img" />
-              <div class="live-image-overlay"></div>
+          </div>
+          <div class="hero-stat-card">
+            <span class="hi-icon">⚡</span>
+            <div>
+              <strong class="hi-val">50,000+</strong>
+              <span class="hi-lbl">Registered Coders</span>
             </div>
-
-            <div class="live-card-footer">
-              <div class="live-participants-avatars">
-                <span class="avatar-pill bg-cyan">AK</span>
-                <span class="avatar-pill bg-orange">RS</span>
-                <span class="avatar-pill bg-purple">VS</span>
-                <span class="avatar-more">+4.8k Live</span>
-              </div>
-              <div class="live-room-info">
-                <strong>24-Hour AI Sprint Active</strong>
-                <span class="live-sub">Mohali • IIT Bombay • Pan-India</span>
-              </div>
+          </div>
+          <div class="hero-stat-card">
+            <span class="hi-icon">💰</span>
+            <div>
+              <strong class="hi-val">₹10 Lakhs+</strong>
+              <span class="hi-lbl">Prize Pool</span>
             </div>
           </div>
         </div>
@@ -235,7 +205,6 @@
       </div>
     </div>
   </section>
-
 
   <section class="opportunities-section" id="opportunities">
     <div class="container">
