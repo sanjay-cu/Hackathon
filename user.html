@@ -928,6 +928,55 @@
         <span class="dot active" data-index="0"></span>
         <span class="dot" data-index="1"></span>
       </div>
+
+      <!-- Interactive Student Review / Comment Submission Form -->
+      <div class="add-review-box" style="margin-top: 3.5rem;">
+        <div class="add-review-card" style="background: #FFFFFF; border-radius: 24px; padding: 2.5rem; border: 1.5px solid var(--border-light); box-shadow: var(--shadow-md); max-width: 750px; margin: 0 auto;">
+          <div class="add-review-header text-center">
+            <span class="form-badge" style="background: rgba(0, 229, 255, 0.12); color: var(--brand-cyan); font-size: 0.75rem; font-weight: 900; padding: 0.35rem 0.85rem; border-radius: 9999px;">POST YOUR COMMENT & REVIEW</span>
+            <h3 class="add-review-title" style="font-family: var(--font-heading); font-size: 1.65rem; font-weight: 800; color: var(--primary-navy); margin-top: 0.5rem; margin-bottom: 0.35rem;">Share Your Student Experience</h3>
+            <p class="text-muted" style="font-size: 0.925rem; color: #64748B;">Post your feedback or comment about hackathons and workshops. It will be published live on the student portal!</p>
+          </div>
+
+          <form id="student-review-form" class="enquiry-form" style="margin-top: 1.5rem;">
+            <div class="form-row">
+              <div class="form-group col-half">
+                <label for="rev_name" class="form-label" style="font-weight: 800; color: var(--primary-navy);">Your Full Name *</label>
+                <div class="input-with-icon">
+                  <span class="input-icon">👤</span>
+                  <input type="text" id="rev_name" class="form-input" placeholder="e.g. Vikram Sharma" required />
+                </div>
+              </div>
+
+              <div class="form-group col-half">
+                <label for="rev_detail" class="form-label" style="font-weight: 800; color: var(--primary-navy);">Branch & University *</label>
+                <div class="input-with-icon">
+                  <span class="input-icon">🏫</span>
+                  <input type="text" id="rev_detail" class="form-input" placeholder="e.g. BE-CSE, Chandigarh University" required />
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="rev_rating" class="form-label" style="font-weight: 800; color: var(--primary-navy);">Rating *</label>
+              <select id="rev_rating" class="form-select" required>
+                <option value="5" selected>⭐⭐⭐⭐⭐ (5/5 Stars - Excellent)</option>
+                <option value="4">⭐⭐⭐⭐ (4/5 Stars - Very Good)</option>
+                <option value="3">⭐⭐⭐ (3/5 Stars - Good)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="rev_comment" class="form-label" style="font-weight: 800; color: var(--primary-navy);">Your Experience / Comment *</label>
+              <textarea id="rev_comment" class="form-textarea" placeholder="Share how HackathonHub helped you find hackathons, workshops, or bootcamps..." rows="3" required></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-full">
+              <span>Post Live Comment / Review 🚀</span>
+            </button>
+          </form>
+        </div>
+      </div>
     </div>
   </section>
 

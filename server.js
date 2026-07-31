@@ -59,9 +59,18 @@ const notificationSchema = new mongoose.Schema({
   body: { type: String, required: true },
   time: { type: String, default: 'Just now' },
   read: { type: Boolean, default: false }
+// 4. Student Review Schema
+const reviewSchema = new mongoose.Schema({
+  id: { type: String, required: true, unique: true },
+  name: { type: String, required: true },
+  detail: { type: String, required: true },
+  rating: { type: String, default: '⭐⭐⭐⭐⭐' },
+  comment: { type: String, required: true },
+  initials: { type: String, default: 'ST' },
+  date: { type: String }
 }, { timestamps: true });
 
-const Notification = mongoose.model('Notification', notificationSchema);
+const Review = mongoose.model('Review', reviewSchema);
 
 /* --------------------------------------------------------------------------
    REST API Endpoints
@@ -169,9 +178,29 @@ app.post('/api/notifications', async (req, res) => {
 app.patch('/api/notifications/read', async (req, res) => {
   try {
     await Notification.updateMany({ read: false }, { read: true });
-    res.json({ message: 'All notifications marked as read' });
+    res.json({ success: true, message: 'All notifications marked as read' });
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+// --- REVIEWS / COMMENTS ENDPOINTS ---
+app.get('/api/reviews', async (req, res) => {
+  try {
+    const reviews = await Review.find().sort({ createdAt: -1 });
+    res.json(reviews);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/reviews', async (req, res) => {
+  try {
+    const review = new Review(req.body);
+    await review.save();
+    res.status(201).json(review);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
   }
 });
 

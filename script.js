@@ -884,54 +884,198 @@ function initMobileDrawer() {
   });
 }
 
-/* --------------------------------------------------------------------------
-   7. Student Review Testimonial Carousel
-   -------------------------------------------------------------------------- */
+async function getReviews() {
+  try {
+    const res = await fetch('/api/reviews');
+    if (res.ok) return await res.json();
+  } catch (e) {}
+  return JSON.parse(localStorage.getItem('cu_reviews') || '[]');
+}
+
+async function saveReviewItem(item) {
+  try {
+    const res = await fetch('/api/reviews', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(item)
+    });
+    if (res.ok) return await res.json();
+  } catch (e) {}
+
+  const reviews = JSON.parse(localStorage.getItem('cu_reviews') || '[]');
+  reviews.unshift(item);
+  localStorage.setItem('cu_reviews', JSON.stringify(reviews));
+  return item;
+}
+
 function initStudentReviewCarousel() {
   const track = document.getElementById('testimonial-track');
-  const prevBtn = document.getElementById('carousel-prev');
-  const nextBtn = document.getElementById('carousel-next');
-  const dots = document.querySelectorAll('.dot');
-  const cards = document.querySelectorAll('.testimonial-card');
+  const dotsContainer = document.getElementById('carousel-dots');
+  const form = document.getElementById('student-review-form');
 
-  if (!track || cards.length === 0) return;
+  if (!track) return;
 
-  let currentIndex = 0;
-  let autoplayTimer = null;
+  renderReviews();
 
-  function goToSlide(index) {
-    if (index < 0) index = cards.length - 1;
-    if (index >= cards.length) index = 0;
-    currentIndex = index;
+  if (form) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('rev_name').value.trim();
+      const detail = document.getElementById('rev_detail').value.trim();
+      const ratingVal = parseInt(document.getElementById('rev_rating').value, 10);
+      const comment = document.getElementById('rev_comment').value.trim();
 
-    track.style.transform = `translateX(-${currentIndex * 100}%)`;
-    dots.forEach((dot, idx) => {
-      if (idx === currentIndex) dot.classList.add('active');
-      else dot.classList.remove('active');
+      const stars = '⭐'.repeat(ratingVal);
+      const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2) || 'ST';
+
+      const newReview = {
+        id: 'REV-' + Date.now(),
+        name,
+        detail,
+        rating: stars,
+        comment,
+        initials,
+        date: getLiveDateTimeString()
+      };
+
+      await saveReviewItem(newReview);
+      form.reset();
+
+      await saveNotificationItem({
+        id: 'NOTIF-' + Date.now(),
+        title: '💬 New Student Review Posted!',
+        body: `${name} (${detail}) posted a review: "${comment}"`,
+        time: 'Just now',
+        read: false
+      });
+
+      await renderReviews();
+      showToastNotification('💬 Review Posted Live!', `Thank you ${name}! Your comment is now live on the student portal.`);
     });
   }
 
-  if (prevBtn) prevBtn.addEventListener('click', () => { goToSlide(currentIndex - 1); resetAutoplay(); });
-  if (nextBtn) nextBtn.addEventListener('click', () => { goToSlide(currentIndex + 1); resetAutoplay(); });
+  async function renderReviews() {
+    const customReviews = await getReviews();
 
-  dots.forEach(dot => {
-    dot.addEventListener('click', () => {
-      const idx = parseInt(dot.getAttribute('data-index'), 10);
-      goToSlide(idx);
-      resetAutoplay();
+    let html = `
+      <div class="testimonial-card active">
+        <div class="t-quote-mark">&ldquo;</div>
+        <p class="t-comment">
+          "HackathonHub makes finding free national hackathons and Agentic AI bootcamps effortless. As an AI/ML student, I registered for top coding sprints across IITs and CU seamlessly!"
+        </p>
+        <div class="t-author">
+          <div class="t-avatar">
+            <img src="aditya.jpg" alt="Aditya Passport Photo" class="t-avatar-img" />
+          </div>
+          <div class="t-info">
+            <h4 class="t-name">Aditya</h4>
+            <span class="t-detail">BE-CSE_AIML, Chandigarh University</span>
+            <div class="t-rating">⭐⭐⭐⭐⭐</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial-card">
+        <div class="t-quote-mark">&ldquo;</div>
+        <p class="t-comment">
+          "The search bar auto-suggesting locations (Mohali, Mumbai, Delhi) and colleges makes finding tech events super fast!"
+        </p>
+        <div class="t-author">
+          <div class="t-avatar">
+            <span style="font-size: 1.25rem; font-weight: 800;">RS</span>
+          </div>
+          <div class="t-info">
+            <h4 class="t-name">Rohan Sharma</h4>
+            <span class="t-detail">B.Tech AI & Data Science, CU</span>
+            <div class="t-rating">⭐⭐⭐⭐⭐</div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    customReviews.forEach(r => {
+      html += `
+        <div class="testimonial-card">
+          <div class="t-quote-mark">&ldquo;</div>
+          <p class="t-comment">"${escapeHtml(r.comment)}"</p>
+          <div class="t-author">
+            <div class="t-avatar" style="background: linear-gradient(135deg, #00E5FF 0%, #7C3AED 100%); color: #FFF;">
+              <span style="font-size: 1.25rem; font-weight: 800;">${escapeHtml(r.initials)}</span>
+            </div>
+            <div class="t-info">
+              <h4 class="t-name">${escapeHtml(r.name)}</h4>
+              <span class="t-detail">${escapeHtml(r.detail)}</span>
+              <div class="t-rating">${r.rating}</div>
+            </div>
+          </div>
+        </div>
+      `;
     });
-  });
 
-  function startAutoplay() {
-    autoplayTimer = setInterval(() => { goToSlide(currentIndex + 1); }, 5000);
+    track.innerHTML = html;
+
+    const cards = track.querySelectorAll('.testimonial-card');
+    if (dotsContainer) {
+      dotsContainer.innerHTML = '';
+      cards.forEach((c, idx) => {
+        const dot = document.createElement('span');
+        dot.className = `dot ${idx === 0 ? 'active' : ''}`;
+        dot.setAttribute('data-index', idx);
+        dotsContainer.appendChild(dot);
+      });
+    }
+
+    setupCarouselNavigation(cards);
   }
 
-  function resetAutoplay() {
-    clearInterval(autoplayTimer);
+  function setupCarouselNavigation(cards) {
+    const prevBtn = document.getElementById('t-prev');
+    const nextBtn = document.getElementById('t-next');
+    const dots = dotsContainer ? dotsContainer.querySelectorAll('.dot') : [];
+
+    let currentIndex = 0;
+    let autoplayTimer = null;
+
+    function goToSlide(index) {
+      if (index < 0) index = cards.length - 1;
+      if (index >= cards.length) index = 0;
+      currentIndex = index;
+
+      cards.forEach((card, idx) => {
+        if (idx === currentIndex) card.classList.add('active');
+        else card.classList.remove('active');
+      });
+
+      track.style.transform = `translateX(-${currentIndex * 100}%)`;
+      dots.forEach((dot, idx) => {
+        if (idx === currentIndex) dot.classList.add('active');
+        else dot.classList.remove('active');
+      });
+    }
+
+    if (prevBtn) prevBtn.onclick = () => { goToSlide(currentIndex - 1); resetAutoplay(); };
+    if (nextBtn) nextBtn.onclick = () => { goToSlide(currentIndex + 1); resetAutoplay(); };
+
+    dots.forEach(dot => {
+      dot.onclick = () => {
+        const idx = parseInt(dot.getAttribute('data-index'), 10);
+        goToSlide(idx);
+        resetAutoplay();
+      };
+    });
+
+    function startAutoplay() {
+      clearInterval(autoplayTimer);
+      autoplayTimer = setInterval(() => { goToSlide(currentIndex + 1); }, 5000);
+    }
+
+    function resetAutoplay() {
+      clearInterval(autoplayTimer);
+      startAutoplay();
+    }
+
     startAutoplay();
   }
-
-  startAutoplay();
 }
 
 /* --------------------------------------------------------------------------
