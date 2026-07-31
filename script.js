@@ -155,6 +155,10 @@ function initAdminAuth() {
   if (!authScreen || !mainLayout) return;
 
   const isAuth = sessionStorage.getItem('admin_authenticated') === 'true';
+  const savedEmail = sessionStorage.getItem('admin_email') || 'sanjayjatchoudhary0@gmail.com';
+  const loggedEmailEl = document.getElementById('admin-logged-email');
+  if (loggedEmailEl) loggedEmailEl.textContent = savedEmail;
+
   if (isAuth) {
     authScreen.classList.add('hidden');
     mainLayout.classList.remove('hidden');
@@ -186,6 +190,8 @@ function initAdminAuth() {
 
       if (authenticated || (isEmailAdmin && isPassOk)) {
         sessionStorage.setItem('admin_authenticated', 'true');
+        sessionStorage.setItem('admin_email', email);
+        if (loggedEmailEl) loggedEmailEl.textContent = email;
         authScreen.classList.add('hidden');
         mainLayout.classList.remove('hidden');
         if (errorMsg) errorMsg.classList.add('hidden');
