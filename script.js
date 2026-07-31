@@ -78,7 +78,6 @@ async function populateOpportunityDropdowns() {
   const adminManualSelect = document.getElementById('m-course');
   const adminFilterSelect = document.getElementById('filter-course');
 
-  // 1. Scan all opportunity cards dynamically on user.html DOM
   const domTitles = [];
   document.querySelectorAll('.opp-card').forEach(card => {
     const titleEl = card.querySelector('.opp-title');
@@ -92,14 +91,12 @@ async function populateOpportunityDropdowns() {
     }
   });
 
-  // 2. Fetch all published events from Database/LocalStorage
   const publishedEvents = await getEvents();
   const customEventTitles = publishedEvents.flatMap(e => [
     `${e.title} [${(e.fee || 'free').toUpperCase()}]`,
     e.title
   ]);
 
-  // 3. Merge uniquely
   const allTracks = Array.from(new Set([
     ...domTitles,
     ...customEventTitles,
@@ -881,11 +878,23 @@ function initMobileDrawer() {
    7. STUDENT REVIEW COMMENTS & STRICT ADMIN APPROVAL MODERATION ENGINE
    -------------------------------------------------------------------------- */
 async function getReviews() {
+  let reviews = [];
   try {
     const res = await fetch('/api/reviews');
-    if (res.ok) return await res.json();
-  } catch (e) {}
-  return JSON.parse(localStorage.getItem('cu_reviews') || '[]');
+    if (res.ok) {
+      reviews = await res.json();
+    } else {
+      reviews = JSON.parse(localStorage.getItem('cu_reviews') || '[]');
+    }
+  } catch (e) {
+    reviews = JSON.parse(localStorage.getItem('cu_reviews') || '[]');
+  }
+
+  // Ensure every review has an explicit status (defaulting to 'Pending' if missing)
+  return reviews.map(r => ({
+    ...r,
+    status: r.status || 'Pending'
+  }));
 }
 
 async function saveReviewItem(item) {
@@ -906,7 +915,6 @@ async function saveReviewItem(item) {
 
 function initStudentReviewCarousel() {
   const track = document.getElementById('testimonial-track');
-  const dotsContainer = document.getElementById('carousel-dots');
   const form = document.getElementById('student-review-form');
 
   if (!track) return;
@@ -924,7 +932,7 @@ function initStudentReviewCarousel() {
       const stars = '⭐'.repeat(ratingVal);
       const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2) || 'ST';
 
-      // SUBMIT WITH STRICT PENDING STATUS (WILL NOT DISPLAY ON STUDENT PANEL UNTIL ADMIN APPROVES)
+      // STRICT PENDING STATUS: Comment will ONLY go to Admin Panel and WILL NOT display on student panel until Admin approves!
       const newReview = {
         id: 'REV-' + Date.now(),
         name,
@@ -941,14 +949,14 @@ function initStudentReviewCarousel() {
 
       await saveNotificationItem({
         id: 'NOTIF-' + Date.now(),
-        title: '💬 New Student Comment Pending Approval',
-        body: `${name} (${detail}) submitted a review: "${comment}". Awaiting admin approval.`,
+        title: '💬 New Student Comment Request Received!',
+        body: `${name} (${detail}) submitted a review: "${comment}". Awaiting coordinator approval in Admin Console.`,
         time: 'Just now',
         read: false
       });
 
-      showToastNotification('⌛ Review Sent to Admin Queue!', `Thank you ${name}! Your comment has been sent to the Admin queue for approval.`);
-      alert(`⌛ Thank you ${name}!\nYour experience comment has been submitted to the Admin approval queue.\n\nIt will NOT display on the Student Panel until the Coordinator approves it in the Admin Console.`);
+      showToastNotification('⌛ Review Sent to Admin Queue!', `Thank you ${name}! Your comment has been sent to the Admin Console for approval.`);
+      alert(`⌛ Thank you ${name}!\n\nYour experience comment has been submitted to the Admin Panel.\n\nIt will NOT display on the Student Portal until the Admin approves it in the Admin Console!`);
     });
   }
 }
@@ -980,7 +988,7 @@ async function renderReviews() {
     }
   ];
 
-  // STRICT FILTER: ONLY DISPLAY REVIEWS APPROVED BY ADMIN
+  // STRICT FILTER: ONLY DISPLAY REVIEWS THAT ARE EXPLICITLY APPROVED BY ADMIN! PENDING REVIEWS WILL NEVER SHOW!
   const approvedCustom = customReviews.filter(r => r.status === 'Approved');
   const allLive = [...defaultReviews, ...approvedCustom].filter(r => !deletedIds.includes(r.id));
 
@@ -1331,8 +1339,8 @@ async function renderAdminReviews() {
       </td>
       <td>
         <div style="display: flex; gap: 0.4rem;">
-          ${!isApproved ? `<button class="btn btn-primary btn-sm" onclick="approveStudentReview('${r.id}')">✓ Approve & Publish</button>` : ''}
-          <button class="btn btn-secondary btn-sm" onclick="deleteStudentReview('${r.id}')" style="color: #EF4444; border-color: #FCA5A5;">🗑️ Delete Anytime</button>
+          ${!isApproved ? `<button class="btn btn-primary btn-sm" onclick="approveStudentReview('${r.id}')">✓ Accept & Publish</button>` : ''}
+          <button class="btn btn-secondary btn-sm" onclick="rejectStudentReview('${r.id}')" style="color: #EF4444; border-color: #FCA5A5;">❌ ${isApproved ? 'Delete Live' : 'Reject'}</button>
         </div>
       </td>
     `;
@@ -1349,7 +1357,7 @@ async function approveStudentReview(id) {
     });
   } catch (e) {}
 
-  const reviews = await getReviews();
+  const reviews = JSON.parse(localStorage.getItem('cu_reviews') || '[]');
   const rev = reviews.find(r => r.id === id);
   if (rev) {
     rev.status = 'Approved';
@@ -1357,16 +1365,16 @@ async function approveStudentReview(id) {
   }
 
   await renderAdminReviews();
-  await renderReviews(); // Instantly update student portal live!
-  alert('✅ Student review approved & published live on the Student Panel!');
+  await renderReviews(); // Live update student panel
+  alert('✅ Comment Accepted & Approved! It is now published live on the Student Panel carousel.');
 }
 
-async function deleteStudentReview(id) {
+async function rejectStudentReview(id) {
   try {
     await fetch(`/api/reviews/${id}`, { method: 'DELETE' });
   } catch (e) {}
 
-  const reviews = await getReviews();
+  const reviews = JSON.parse(localStorage.getItem('cu_reviews') || '[]');
   const filtered = reviews.filter(r => r.id !== id);
   localStorage.setItem('cu_reviews', JSON.stringify(filtered));
 
@@ -1377,8 +1385,8 @@ async function deleteStudentReview(id) {
   }
 
   await renderAdminReviews();
-  await renderReviews(); // Instantly remove from student portal live!
-  alert('🗑️ Comment removed successfully! It will no longer display on the Student Panel.');
+  await renderReviews(); // Live update student panel
+  alert('❌ Comment Rejected & Removed! It will NOT be displayed on the Student Panel.');
 }
 
 function initAdminSidebarTabs() {
