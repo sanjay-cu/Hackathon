@@ -14,28 +14,40 @@
   <!-- Custom Styles -->
   <link rel="stylesheet" href="style.css" />
   <style>
-    /* ULTRA-PREMIUM VIVID LANDING GATEWAY STYLES */
+    /* SINGLE SCREEN 100VH NON-SCROLLING GATEWAY STYLES */
+    html, body {
+      height: 100%;
+      max-height: 100vh;
+      margin: 0;
+      padding: 0;
+      overflow: hidden !important;
+    }
+
     .portal-page-body {
       background: 
         linear-gradient(180deg, rgba(7, 11, 25, 0.65) 0%, rgba(7, 11, 25, 0.88) 100%),
         url('portal_bg.jpg') no-repeat center center / cover;
-      min-height: 100vh;
+      height: 100vh;
+      max-height: 100vh;
       color: #FFFFFF;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      overflow-x: hidden;
+      overflow: hidden;
       font-family: var(--font-body);
+      box-sizing: border-box;
     }
 
+    /* TOP BAR - COMPACT SINGLE SCREEN FIT */
     .portal-top-bar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 1.5rem 3rem;
+      padding: 0.85rem 3rem;
       position: relative;
       z-index: 10;
       background: linear-gradient(180deg, rgba(7, 11, 25, 0.85) 0%, transparent 100%);
+      flex-shrink: 0;
     }
 
     .portal-nav-links {
@@ -48,7 +60,7 @@
     .portal-nav-links a {
       color: #CBD5E1;
       font-weight: 800;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       display: flex;
       align-items: center;
       gap: 0.45rem;
@@ -61,11 +73,12 @@
       text-shadow: 0 0 10px var(--brand-cyan-glow);
     }
 
+    /* HERO CONTAINER - AUTOSIZED FIT IN CENTER */
     .portal-hero-container {
-      max-width: 1050px;
+      max-width: 950px;
       margin: 0 auto;
       text-align: center;
-      padding: 2.5rem 1.5rem;
+      padding: 0.5rem 1.5rem;
       position: relative;
       z-index: 5;
       flex: 1;
@@ -73,44 +86,46 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
+      box-sizing: border-box;
     }
 
     .portal-main-title {
       font-family: var(--font-heading);
-      font-size: clamp(3rem, 6vw, 4.8rem);
+      font-size: clamp(2.2rem, 4.2vw, 3.8rem);
       font-weight: 900;
       letter-spacing: -0.03em;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.25rem;
       text-shadow: 0 10px 35px rgba(0, 0, 0, 0.9);
+      line-height: 1.15;
     }
 
     .portal-subtitle-tag {
-      font-size: 1.5rem;
+      font-size: clamp(1rem, 1.8vw, 1.3rem);
       font-weight: 800;
       background: linear-gradient(135deg, #00E5FF 0%, #A855F7 50%, #FF9100 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      margin-bottom: 3.5rem;
+      margin-bottom: 1.75rem;
       letter-spacing: 0.04em;
       filter: drop-shadow(0 4px 12px rgba(0, 229, 255, 0.4));
     }
 
-    /* DUAL GATEWAY CHOICE CARDS - EXACT SAME SIZING FOR USER AND ADMIN */
+    /* DUAL GATEWAY CHOICE CARDS - COMPACT PERFECT 100VH FIT */
     .portal-cards-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 2.75rem;
+      gap: 2rem;
       width: 100%;
-      max-width: 880px;
-      margin: 0 auto 3.5rem auto;
+      max-width: 780px;
+      margin: 0 auto;
       align-items: stretch;
     }
 
     .gateway-card {
       background: rgba(15, 23, 42, 0.88);
       backdrop-filter: blur(28px);
-      border-radius: 32px;
-      padding: 3.5rem 2.25rem;
+      border-radius: 28px;
+      padding: 1.75rem 1.75rem 1.5rem 1.75rem;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -119,30 +134,28 @@
       transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
       position: relative;
       overflow: hidden;
-      min-height: 450px;
-      height: 100%;
     }
 
     /* User Card Glow (Blue/Cyan Theme) */
     .gateway-card.user-card {
       border: 2px solid rgba(0, 229, 255, 0.45);
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 35px rgba(0, 229, 255, 0.25);
+      box-shadow: 0 15px 45px rgba(0, 0, 0, 0.7), 0 0 30px rgba(0, 229, 255, 0.25);
     }
     .gateway-card.user-card:hover {
-      transform: translateY(-12px) scale(1.03);
+      transform: translateY(-8px) scale(1.02);
       border-color: #00E5FF;
-      box-shadow: 0 30px 80px rgba(0, 229, 255, 0.55), 0 0 50px rgba(0, 229, 255, 0.35);
+      box-shadow: 0 25px 60px rgba(0, 229, 255, 0.55), 0 0 40px rgba(0, 229, 255, 0.35);
     }
 
     /* Admin Card Glow (Purple Theme) */
     .gateway-card.admin-card {
       border: 2px solid rgba(168, 85, 247, 0.45);
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 35px rgba(168, 85, 247, 0.25);
+      box-shadow: 0 15px 45px rgba(0, 0, 0, 0.7), 0 0 30px rgba(168, 85, 247, 0.25);
     }
     .gateway-card.admin-card:hover {
-      transform: translateY(-12px) scale(1.03);
+      transform: translateY(-8px) scale(1.02);
       border-color: #A855F7;
-      box-shadow: 0 30px 80px rgba(168, 85, 247, 0.55), 0 0 50px rgba(168, 85, 247, 0.35);
+      box-shadow: 0 25px 60px rgba(168, 85, 247, 0.55), 0 0 40px rgba(168, 85, 247, 0.35);
     }
 
     .gateway-card-top {
@@ -153,54 +166,54 @@
     }
 
     .gateway-icon-circle {
-      width: 96px;
-      height: 96px;
+      width: 72px;
+      height: 72px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 2.7rem;
-      margin-bottom: 1.65rem;
+      font-size: 2.1rem;
+      margin-bottom: 0.85rem;
       position: relative;
     }
 
     .user-card .gateway-icon-circle {
       background: linear-gradient(135deg, #2563EB 0%, #00E5FF 100%);
-      box-shadow: 0 10px 30px rgba(0, 229, 255, 0.5);
+      box-shadow: 0 8px 25px rgba(0, 229, 255, 0.5);
       color: #FFFFFF;
     }
 
     .admin-card .gateway-icon-circle {
       background: linear-gradient(135deg, #7C3AED 0%, #A855F7 100%);
-      box-shadow: 0 10px 30px rgba(168, 85, 247, 0.5);
+      box-shadow: 0 8px 25px rgba(168, 85, 247, 0.5);
       color: #FFFFFF;
     }
 
     .gateway-card-title {
       font-family: var(--font-heading);
-      font-size: 2.25rem;
+      font-size: 1.85rem;
       font-weight: 900;
       color: #FFFFFF;
-      margin-bottom: 0.75rem;
+      margin-bottom: 0.4rem;
       text-shadow: 0 4px 12px rgba(0,0,0,0.5);
     }
 
     .gateway-card-desc {
-      font-size: 1rem;
+      font-size: 0.9rem;
       color: #CBD5E1;
-      line-height: 1.6;
-      margin-bottom: 2rem;
+      line-height: 1.45;
+      margin-bottom: 1.25rem;
       font-weight: 600;
-      max-width: 320px;
+      max-width: 280px;
     }
 
     .btn-gateway {
       width: 100%;
-      padding: 1.1rem 1.85rem;
+      padding: 0.85rem 1.5rem;
       border-radius: var(--radius-full);
       font-family: var(--font-heading);
       font-weight: 900;
-      font-size: 1.15rem;
+      font-size: 1rem;
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -212,72 +225,78 @@
     .btn-gateway-user {
       background: linear-gradient(135deg, #2563EB 0%, #00B4D8 100%);
       color: #FFFFFF;
-      box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4);
+      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
     }
     .btn-gateway-user:hover {
       background: linear-gradient(135deg, #3B82F6 0%, #00E5FF 100%);
       transform: translateY(-2px);
-      box-shadow: 0 14px 35px rgba(0, 229, 255, 0.6);
+      box-shadow: 0 10px 30px rgba(0, 229, 255, 0.6);
     }
 
     .btn-gateway-admin {
       background: linear-gradient(135deg, #7C3AED 0%, #C084FC 100%);
       color: #FFFFFF;
-      box-shadow: 0 8px 25px rgba(124, 58, 237, 0.4);
+      box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4);
     }
     .btn-gateway-admin:hover {
       background: linear-gradient(135deg, #8B5CF6 0%, #D8B4FE 100%);
       transform: translateY(-2px);
-      box-shadow: 0 14px 35px rgba(168, 85, 247, 0.6);
+      box-shadow: 0 10px 30px rgba(168, 85, 247, 0.6);
     }
 
-    /* BOTTOM FLOATING PILL & QUOTE */
+    /* BOTTOM FLOATING PILL & QUOTE - COMPACT FIT */
     .portal-bottom-bar {
-      padding: 2.25rem 1.5rem;
+      padding: 0.65rem 1.5rem 0.85rem 1.5rem;
       text-align: center;
       position: relative;
       z-index: 10;
       background: linear-gradient(0deg, rgba(7, 11, 25, 0.95) 0%, transparent 100%);
+      flex-shrink: 0;
     }
 
     .floating-features-pill {
       display: inline-flex;
       align-items: center;
-      gap: 2.25rem;
+      gap: 1.75rem;
       background: rgba(15, 23, 42, 0.85);
       backdrop-filter: blur(20px);
       border: 1.5px solid rgba(0, 229, 255, 0.3);
-      padding: 0.8rem 2.5rem;
+      padding: 0.5rem 1.85rem;
       border-radius: var(--radius-full);
-      margin-bottom: 1.25rem;
-      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.5);
+      margin-bottom: 0.4rem;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
     }
 
     .pill-feature-item {
       display: flex;
       align-items: center;
-      gap: 0.55rem;
-      font-size: 0.925rem;
+      gap: 0.45rem;
+      font-size: 0.85rem;
       font-weight: 800;
       color: #F1F5F9;
     }
 
     .portal-quote {
-      font-size: 1.25rem;
+      font-size: 0.95rem;
       font-weight: 800;
       color: var(--brand-cyan);
       font-style: italic;
-      letter-spacing: 0.04em;
-      text-shadow: 0 0 14px var(--brand-cyan-glow);
+      letter-spacing: 0.03em;
+      text-shadow: 0 0 10px var(--brand-cyan-glow);
     }
 
     @media (max-width: 768px) {
+      html, body, .portal-page-body {
+        height: auto;
+        max-height: none;
+        overflow-y: auto !important;
+      }
       .portal-cards-grid {
         grid-template-columns: 1fr;
-        gap: 1.5rem;
+        gap: 1.25rem;
       }
       .portal-top-bar {
-        padding: 1.25rem 1.5rem;
+        padding: 1rem 1.25rem;
       }
     }
   </style>
@@ -288,11 +307,11 @@
   <header class="portal-top-bar">
     <a href="index.html" class="logo-link">
       <div class="logo-glow-wrapper">
-        <img src="hackathon-hub-logo.png" alt="HackHub Logo" class="official-brand-logo-img" style="height: 52px;" />
+        <img src="hackathon-hub-logo.png" alt="HackHub Logo" class="official-brand-logo-img" style="height: 44px;" />
       </div>
       <div class="brand-text-block">
-        <span class="logo-brand-title" style="font-size: 1.6rem;"><span class="text-cyan">Hack</span><span class="text-orange">Hub</span></span>
-        <span class="logo-brand-sub" style="color: #CBD5E1; font-weight: 800;">Find the Next Tech Event</span>
+        <span class="logo-brand-title" style="font-size: 1.45rem;"><span class="text-cyan">Hack</span><span class="text-orange">Hub</span></span>
+        <span class="logo-brand-sub" style="color: #CBD5E1; font-weight: 800; font-size: 0.7rem;">Find the Next Tech Event</span>
       </div>
     </a>
 
@@ -302,7 +321,7 @@
     </ul>
   </header>
 
-  <!-- Main Gateway Entrance Hero (Rocket Sign Removed) -->
+  <!-- Main Gateway Entrance Hero (FITS 100% PERFECTLY ON ONE SINGLE SCREEN) -->
   <main class="portal-hero-container">
     <h1 class="portal-main-title">Welcome to <span class="text-cyan">Hack</span><span class="text-orange">Hub</span></h1>
     <div class="portal-subtitle-tag">Discover opportunities, participate in hackathons, and build your future.</div>
