@@ -183,9 +183,9 @@ function initAdminAuth() {
       } catch (err) {}
 
       const isEmailAdmin = email.includes('sanjay') || email.includes('admin') || email.includes('cu');
-      const isPassOk = password.length >= 4;
+      const isPasswordCorrect = password === 'Sanjay@9351294898';
 
-      if (authenticated || (isEmailAdmin && isPassOk)) {
+      if (authenticated || (isEmailAdmin && isPasswordCorrect)) {
         sessionStorage.setItem('admin_authenticated', 'true');
         sessionStorage.setItem('admin_email', email);
         if (loggedEmailEl) loggedEmailEl.textContent = email;
@@ -196,7 +196,7 @@ function initAdminAuth() {
       } else {
         if (errorMsg) {
           errorMsg.classList.remove('hidden');
-          errorMsg.innerHTML = '❌ Incorrect Email or Password! Access Denied.';
+          errorMsg.innerHTML = '❌ Incorrect Admin Password! Access Denied.';
         }
       }
     });

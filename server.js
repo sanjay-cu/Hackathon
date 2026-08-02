@@ -86,12 +86,12 @@ app.post('/api/admin/login', (req, res) => {
   const password = (req.body.password || '').trim();
 
   const isEmailAdmin = email.includes('admin') || email.includes('sanjay') || email.includes('cu');
-  const isPassValid = password.length >= 4;
+  const isPasswordCorrect = password === 'Sanjay@9351294898';
 
-  if (isEmailAdmin && isPassValid) {
+  if (isEmailAdmin && isPasswordCorrect) {
     res.json({ success: true, token: 'ADMIN_SECURE_TOKEN_GRANTED', user: email });
   } else {
-    res.status(401).json({ success: false, message: 'Invalid Admin Email or Password' });
+    res.status(401).json({ success: false, message: 'Invalid Admin Password' });
   }
 });
 
